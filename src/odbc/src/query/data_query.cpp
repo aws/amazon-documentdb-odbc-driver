@@ -329,10 +329,10 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
     odbc::DocumentDbError error(
         odbc::DocumentDbError::DOCUMENTDB_ERR_SECURE_CONNECTION_FAILURE,
         message.str().c_str());
-    diag.AddStatusRecord(error.GetText());
+    diag.AddStatusRecord(Logger::RedactMessage(error.GetText()));
 
     LOG_ERROR_MSG(
-        "MakeRequestFetch exiting with error msg: " << error.GetText());
+        "MakeRequestFetch exiting with error msg: " << Logger::RedactMessage(error.GetText()));
 
     return SqlResult::AI_ERROR;
   }
@@ -402,9 +402,9 @@ SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
   SharedPointer< DocumentDbMqlQueryContext > mqlQueryContext;
   SqlResult::Type sqlRes = GetMqlQueryContext(mqlQueryContext, error);
   if (!mqlQueryContext.IsValid() || sqlRes != SqlResult::AI_SUCCESS) {
-    diag.AddStatusRecord(error.GetText());
+    diag.AddStatusRecord(Logger::RedactMessage(error.GetText()));
     LOG_ERROR_MSG(
-        "MakeRequestResultsetMeta exiting with error msg: " << error.GetText());
+        "MakeRequestResultsetMeta exiting with error msg: " << Logger::RedactMessage(error.GetText()));
 
     return SqlResult::AI_ERROR;
   }

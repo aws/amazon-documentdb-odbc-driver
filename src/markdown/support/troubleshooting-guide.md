@@ -48,7 +48,10 @@ to your connection string.
 
 ### Notes
 
-In case of an error occours during the SQL query processing. The SQL query will
-be logged and thrown in the case the LOG_LEVEL is set to `DEBUG`. In the case
-the `LOG_LEVEL` is set to `ERROR` or `INFO`, the error code will be logged and
-thrown, but the SQL query will be redacted.
+If an error occurs during SQL query processing, the following logging behavior
+is enforced to remove the chance of accidentally exposing proprietary
+information.  When the `LOG_LEVEL` is set to `ERROR` or `INFO`, the error code
+will be logged and thrown, but the contents of SQL query error message will be
+fully redacted. However, when the `LOG_LEVEL` is set to `DEBUG`, the contents
+of the SQL query error message will be logged and thrown in clear text. The
+default `LOG_LEVEL` is `ERROR`.
