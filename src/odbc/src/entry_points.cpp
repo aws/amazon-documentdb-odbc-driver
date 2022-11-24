@@ -428,6 +428,15 @@ SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
   return documentdb::SQLSetConnectAttr(conn, attr, value, valueLen);
 }
 
+SQLRETURN SQLGetFunctions(
+    SQLHDBC connectionHandle, SQLUSMALLINT functionId,
+    _Out_writes_opt_(_Inexpressible_(
+        "Buffer length pfExists points to depends on fFunction value."))
+        SQLUSMALLINT* supportedPtr) {
+  return documentdb::SQLGetFunctions(connectionHandle, functionId,
+                                     supportedPtr);
+}
+
 //
 // ==== Not Supported ====
 //

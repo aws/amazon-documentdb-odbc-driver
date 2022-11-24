@@ -1573,4 +1573,25 @@ SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
 
+SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionHandle,
+                                  SQLUSMALLINT functionId,
+                                  SQLUSMALLINT* supportedPtr) {
+
+  using odbc::Connection;
+
+  LOG_DEBUG_MSG("SQLGetFunctions called(" << functionId << ")");
+
+  Connection* connection = reinterpret_cast< Connection* >(connectionHandle);
+
+  if (!connection) {
+    LOG_ERROR_MSG(
+        "SQLGetFunctions exiting with SQL_INVALID_HANDLE because connection "
+        "object is null");
+    return SQL_INVALID_HANDLE;
+  }
+
+  connection->GetFunctions(functionId, supportedPtr);
+
+  return connection->GetDiagnosticRecords().GetReturnCode();
+}
 }  // namespace documentdb

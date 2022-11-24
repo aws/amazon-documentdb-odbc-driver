@@ -257,6 +257,15 @@ class Connection : public diagnostic::DiagnosableAdapter {
    */
   void SetAttribute(int attr, void* value, SQLINTEGER valueLen);
 
+  /**
+   * Gets the function(s) supported by this driver.
+   * 
+   * @param functionId the function identifier.
+   * @param supportedPtr a pointer to a single or array of function supported indicators.
+   */
+  void GetFunctions(SQLUSMALLINT functionId,
+                    SQLUSMALLINT* supportedPtr);
+
   inline std::shared_ptr< mongocxx::client >& GetMongoClient() {
     return mongoClient_;
   }
@@ -451,6 +460,18 @@ class Connection : public diagnostic::DiagnosableAdapter {
                                        SQLINTEGER valueLen);
 
   /**
+   * Gets the function(s) supported by this driver.
+   *
+   * @param functionId the function identifier.
+   * @param supportedPtr a pointer to a single or array of function supported
+   * indicators.
+   */
+  SqlResult::Type InternalGetFunctions(SQLUSMALLINT functionId,
+                                       SQLUSMALLINT* supportedPtr);
+
+  void EnsureSupportedFunctionsInitialized();
+
+  /**
    * Ensure there is a connection to the cluster.
    *
    * @throw OdbcError on failure.
@@ -537,6 +558,8 @@ class Connection : public diagnostic::DiagnosableAdapter {
 
   /** JVM options */
   std::vector< char* > opts_;
+
+  std::vector< byte > supportedFunctions_;
 };
 }  // namespace odbc
 }  // namespace documentdb

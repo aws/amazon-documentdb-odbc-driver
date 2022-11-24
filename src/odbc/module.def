@@ -40,6 +40,7 @@ EXPORTS
 	SQLGetDiagFieldW
 	SQLGetDiagRecW
 	SQLGetEnvAttr
+	SQLGetFunctions
 	SQLGetInfoW
 	SQLGetStmtAttrW
 	SQLGetTypeInfoW

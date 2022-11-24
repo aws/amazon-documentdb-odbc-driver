@@ -62,6 +62,12 @@ using documentdb::odbc::jni::java::BuildJvmOptions;
 using documentdb::odbc::jni::java::JniErrorCode;
 using documentdb::odbc::jni::java::JniHandlers;
 
+/**
+ * Sets the bit for the supported function bit array.
+ */
+#define SQL_FUNC_SET_EXISTS(pfExists, uwAPI) \
+  (*(((UWORD*)(pfExists)) + ((uwAPI) >> 4)) |= (1 << ((uwAPI)&0x000F)))
+
 // Uncomment for per-byte debug.
 //#define PER_BYTE_DEBUG
 
@@ -392,6 +398,145 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
   }
 
   return SqlResult::AI_SUCCESS;
+}
+
+void Connection::GetFunctions(SQLUSMALLINT functionId, SQLUSMALLINT* supportedPtr) {
+  DOCUMENTDB_ODBC_API_CALL(InternalGetFunctions(functionId, supportedPtr));
+}
+
+SqlResult::Type Connection::InternalGetFunctions(SQLUSMALLINT functionId,
+                                                 SQLUSMALLINT* supportedPtr) {
+  if (!supportedPtr) {
+    AddStatusRecord(SqlState::SHY009_INVALID_USE_OF_NULL_POINTER,
+                    "Target pointer 'supportedPtr' must not be null.");
+    return SqlResult::AI_ERROR;
+  }
+
+  EnsureSupportedFunctionsInitialized();
+
+  if (functionId == SQL_API_ALL_FUNCTIONS) {
+    memset(supportedPtr, 0, sizeof(SQLUSMALLINT) * 100);
+    for (int i = 0; i < 100; i++) {
+      supportedPtr[i] = supportedFunctions_[i];
+    }
+  } else if (functionId == SQL_API_ODBC3_ALL_FUNCTIONS) {
+    memset(supportedPtr, 0,
+           sizeof(SQLUSMALLINT) * SQL_API_ODBC3_ALL_FUNCTIONS_SIZE);
+    for (int i = 0; i < SQL_API_ODBC3_ALL_FUNCTIONS_SIZE; i++) {
+      if (supportedFunctions_[i]) {
+        SQL_FUNC_SET_EXISTS(supportedPtr, i);
+      }
+    }
+  } else {
+    if (functionId < supportedFunctions_.size()) {
+      *supportedPtr = supportedFunctions_[functionId];
+    } else {
+      std::string message;
+      message.append("Requested functionId '")
+          .append(std::to_string(functionId))
+          .append("' is invalid.");
+      AddStatusRecord(SqlState::SHY024_INVALID_ATTRIBUTE_VALUE, message);
+      return SqlResult::AI_ERROR;
+    }
+  }
+
+  return SqlResult::AI_SUCCESS;
+}
+
+void Connection::EnsureSupportedFunctionsInitialized() {
+  if (supportedFunctions_.empty()) {
+    int arraySize =
+        SQL_API_ODBC3_ALL_FUNCTIONS_SIZE * (sizeof(SQLUSMALLINT) * 8);
+    supportedFunctions_.resize(arraySize, 0);
+
+    supportedFunctions_[SQL_API_SQLALLOCCONNECT] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLALLOCENV] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLALLOCHANDLE] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLALLOCSTMT] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLBINDCOL] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLBINDPARAM] = SQL_FALSE;
+#endif
+    supportedFunctions_[SQL_API_SQLCANCEL] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLCLOSECURSOR] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLCOLATTRIBUTE] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLCOLUMNS] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLCONNECT] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLCOPYDESC] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLDATASOURCES] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLDESCRIBECOL] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLDISCONNECT] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLENDTRAN] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLERROR] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLEXECDIRECT] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLEXECUTE] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLFETCH] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLFETCHSCROLL] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLFREECONNECT] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLFREEENV] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLFREEHANDLE] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLFREESTMT] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLGETCONNECTATTR] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLGETCONNECTOPTION] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLGETCURSORNAME] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLGETDATA] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLGETDESCFIELD] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLGETDESCREC] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLGETDIAGFIELD] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLGETDIAGREC] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLGETENVATTR] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLGETFUNCTIONS] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLGETINFO] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLGETSTMTATTR] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLGETSTMTOPTION] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLGETTYPEINFO] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLNUMRESULTCOLS] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLPARAMDATA] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLPREPARE] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLPUTDATA] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLROWCOUNT] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLSETCONNECTATTR] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLSETCONNECTOPTION] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLSETCURSORNAME] = SQL_TRUE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLSETDESCFIELD] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLSETDESCREC] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLSETENVATTR] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLSETPARAM] = SQL_FALSE;
+#if (ODBCVER >= 0x0300)
+    supportedFunctions_[SQL_API_SQLSETSTMTATTR] = SQL_TRUE;
+#endif
+    supportedFunctions_[SQL_API_SQLSETSTMTOPTION] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLSPECIALCOLUMNS] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLSTATISTICS] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLTABLES] = SQL_TRUE;
+    supportedFunctions_[SQL_API_SQLTRANSACT] = SQL_FALSE;
+#if (ODBCVER >= 0x0380)
+    supportedFunctions_[SQL_API_SQLCANCELHANDLE] = SQL_FALSE;
+    supportedFunctions_[SQL_API_SQLCOMPLETEASYNC] = SQL_FALSE;
+#endif
+  }
 }
 
 void Connection::EnsureConnected() {

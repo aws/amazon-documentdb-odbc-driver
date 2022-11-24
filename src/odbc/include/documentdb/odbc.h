@@ -202,6 +202,10 @@ SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
 
 SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr,
                                     SQLPOINTER value, SQLINTEGER valueLen);
+
+SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionHandle,
+                                  SQLUSMALLINT functionId,
+                                  SQLUSMALLINT* supportedPtr);
 }  // namespace documentdb
 
 #endif  // _DOCUMENTDB_ODBC_ODBC

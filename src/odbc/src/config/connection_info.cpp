@@ -566,6 +566,12 @@ const char* ConnectionInfo::InfoTypeToString(InfoType type) {
 #ifdef SQL_DTC_TRANSITION_COST
     DBG_STR_CASE(SQL_DTC_TRANSITION_COST);
 #endif  // SQL_DTC_TRANSITION_COST
+#ifdef SQL_CURSOR_COMMIT_BEHAVIOR
+    DBG_STR_CASE(SQL_CURSOR_COMMIT_BEHAVIOR);
+#endif  // SQL_CURSOR_COMMIT_BEHAVIOR
+#ifdef SQL_CURSOR_ROLLBACK_BEHAVIOR
+    DBG_STR_CASE(SQL_CURSOR_ROLLBACK_BEHAVIOR);
+#endif  // SQL_CURSOR_ROLLBACK_BEHAVIOR
     default:
       break;
   }
@@ -2851,6 +2857,12 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //     keywords.
   shortParams[SQL_NULL_COLLATION] = SQL_NC_LOW;
 #endif  // SQL_NULL_COLLATION
+#ifdef SQL_CURSOR_COMMIT_BEHAVIOR
+  shortParams[SQL_CURSOR_COMMIT_BEHAVIOR] = SQL_CB_DELETE;
+#endif  // SQL_CURSOR_COMMIT_BEHAVIOR
+#ifdef SQL_CURSOR_ROLLBACK_BEHAVIOR
+  shortParams[SQL_CURSOR_ROLLBACK_BEHAVIOR] = SQL_CB_DELETE;
+#endif
 }
 
 ConnectionInfo::~ConnectionInfo() {
@@ -2886,7 +2898,10 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
   if (itInt != intParams.end()) {
     unsigned int* res = reinterpret_cast< unsigned int* >(buf);
 
-    *res = itInt->second;
+    if (res)
+      *res = itInt->second;
+    if (reslen)
+      *reslen = 4;
 
     return SqlResult::AI_SUCCESS;
   }
@@ -2896,7 +2911,10 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
   if (itShort != shortParams.end()) {
     unsigned short* res = reinterpret_cast< unsigned short* >(buf);
 
-    *res = itShort->second;
+    if (res)
+      *res = itShort->second;
+    if (reslen)
+      *reslen = 2;
 
     return SqlResult::AI_SUCCESS;
   }
