@@ -559,7 +559,8 @@ class Connection : public diagnostic::DiagnosableAdapter {
   /** JVM options */
   std::vector< char* > opts_;
 
-  std::vector< byte > supportedFunctions_;
+  /** List of supported functions */
+  std::vector< char > supportedFunctions_;
 };
 }  // namespace odbc
 }  // namespace documentdb
