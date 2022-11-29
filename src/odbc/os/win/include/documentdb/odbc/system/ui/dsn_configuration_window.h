@@ -142,8 +142,8 @@ class DsnConfigurationWindow : public CustomWindow {
    *
    * @param parent Parent window handle.
    */
-  explicit DsnConfigurationWindow(Window* parent,
-                                  config::Configuration& config);
+  explicit DsnConfigurationWindow(Window* parent, config::Configuration& config,
+                                  bool requiresCredentials);
 
   /**
    * Destructor.
@@ -572,6 +572,9 @@ class DsnConfigurationWindow : public CustomWindow {
 
   /** Previous tabs item index. */
   TabIndex::Type prevSelectedTabIndex;
+
+  /** Indicator of whenther credentials are required on this window. */
+  bool requiresCredentials;
 
   /** Configuration. */
   config::Configuration& config;

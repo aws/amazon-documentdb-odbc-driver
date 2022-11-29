@@ -37,7 +37,8 @@ class Configuration;
  * @return True on success and false on fail.
  */
 bool DisplayConnectionWindow(void* windowParent,
-                             documentdb::odbc::config::Configuration& config);
+                             documentdb::odbc::config::Configuration& config,
+                             bool requiresCredentials = false);
 #endif
 
 #endif  //_DOCUMENTDB_ODBC_SYSTEM_SYSTEM_DSN

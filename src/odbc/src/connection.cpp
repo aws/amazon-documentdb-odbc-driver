@@ -132,7 +132,7 @@ SqlResult::Type Connection::InternalEstablish(const std::string& connectStr,
 #ifdef _WIN32
   if (parentWindow) {
     LOG_MSG("Parent window is passed. Creating configuration window.");
-    if (!DisplayConnectionWindow(parentWindow, config_)) {
+    if (!DisplayConnectionWindow(parentWindow, config_, true)) {
       AddStatusRecord(odbc::SqlState::SHY008_OPERATION_CANCELED,
                       "Connection canceled by user");
 
