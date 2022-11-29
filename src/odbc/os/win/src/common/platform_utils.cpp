@@ -27,9 +27,8 @@ namespace documentdb {
 namespace odbc {
 namespace common {
 time_t ToTimeGm(const tm& time) {
-  tm tmc = time;
-
-  return _mkgmtime(&tmc);
+  auto dateTime = boost::posix_time::ptime_from_tm(time);
+  return boost::posix_time::to_time_t(dateTime);
 }
 
 time_t ToTimeLocal(const tm& time) {
