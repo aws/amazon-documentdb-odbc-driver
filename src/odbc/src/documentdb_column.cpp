@@ -491,18 +491,18 @@ ConversionResult::Type DocumentDbColumn::PutTime(
   boost::optional< Time > value{};
   switch (docType) {
     case bsoncxx::type::k_int64:
-      break;
       value = Time(element.get_int64().value);
+      break;
     case bsoncxx::type::k_date:
       value = Time(element.get_date().to_int64());
       break;
-    case bsoncxx::type::k_timestamp:
+    case bsoncxx::type::k_timestamp: {
       // Convert from seconds after Epoch
       auto milliSecsFromEpoch =
           std::chrono::duration_cast< std::chrono::milliseconds >(
               std::chrono::seconds(element.get_timestamp().timestamp));
       value = Time(milliSecsFromEpoch.count());
-      break;
+    } break;
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
       // https://bitquill.atlassian.net/browse/AD-680
@@ -531,13 +531,13 @@ ConversionResult::Type DocumentDbColumn::PutDate(
     case bsoncxx::type::k_date:
       value = Date(element.get_date().to_int64());
       break;
-    case bsoncxx::type::k_timestamp:
+    case bsoncxx::type::k_timestamp: {
       // Convert from seconds after Epoch
       auto milliSecsFromEpoch =
           std::chrono::duration_cast< std::chrono::milliseconds >(
               std::chrono::seconds(element.get_timestamp().timestamp));
       value = Date(milliSecsFromEpoch.count());
-      break;
+    } break;
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
       // https://bitquill.atlassian.net/browse/AD-680
