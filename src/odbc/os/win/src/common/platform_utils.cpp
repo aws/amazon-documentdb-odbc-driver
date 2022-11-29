@@ -16,6 +16,7 @@
  */
 
 #include <Windows.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <documentdb/odbc/common/platform_utils.h>
 #include <documentdb/odbc/utility.h>
 #include <time.h>
@@ -38,7 +39,10 @@ time_t ToTimeLocal(const tm& time) {
 }
 
 bool ToGmTime(time_t in, tm& out) {
-  return gmtime_s(&out, &in) == 0;
+  boost::posix_time::ptime in_ptime =
+      boost::posix_time::from_time_t((time_t)in);
+  out = boost::posix_time::to_tm(in_ptime);
+  return true;
 }
 
 bool ToLocalTime(time_t in, tm& out) {

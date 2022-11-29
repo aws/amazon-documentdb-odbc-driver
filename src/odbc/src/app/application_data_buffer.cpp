@@ -775,7 +775,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
     const Timestamp& value) {
   using namespace type_traits;
 
-  tm tmTime;
+  tm tmTime = {};
 
   common::TimestampToCTm(value, tmTime);
 
