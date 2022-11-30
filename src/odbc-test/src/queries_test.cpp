@@ -332,10 +332,10 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   BOOST_CHECK_EQUAL(12, fieldTimestamp.month);
   BOOST_CHECK_EQUAL(31, fieldTimestamp.day);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldTimestampAsString_len);
-  BOOST_CHECK_EQUAL("1971-12-31 23:59:59", utility::SqlWcharToString(fieldTimestampAsString,
+  BOOST_CHECK_EQUAL("1971-Dec-31 23:59:59", utility::SqlWcharToString(fieldTimestampAsString,
                                              fieldTimestampAsString_len, false));
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDateAsString_len);
-  BOOST_CHECK_EQUAL("1920-01-01 00:00:00",
+  BOOST_CHECK_EQUAL("1920-Jan-01 00:00:00",
                     utility::SqlWcharToString(fieldDateAsString,
                                              fieldDateAsString_len, false));
 
