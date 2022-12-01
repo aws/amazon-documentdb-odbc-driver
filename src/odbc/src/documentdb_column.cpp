@@ -20,6 +20,7 @@
 #include <ctime>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "documentdb/odbc/documentdb_column.h"
+#include "documentdb/odbc/log.h"
 #include <documentdb/odbc/impl/interop/interop_stream_position_guard.h>
 #include "documentdb/odbc/utility.h"
 #include "bsoncxx/types.hpp"
@@ -564,9 +565,11 @@ ConversionResult::Type DocumentDbColumn::PutTimestamp(
       value = Timestamp(element.get_int64().value);
       break;
     case bsoncxx::type::k_date:
+      LOG_DEBUG_MSG("Reading date: " << element.get_date().to_int64())
       value = Timestamp(element.get_date().to_int64());
       break;
     case bsoncxx::type::k_timestamp:
+      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       // MongoDB Timestamp is the number of seconds since the epoch.
       value = Timestamp(element.get_timestamp().timestamp, 0);
       break;
