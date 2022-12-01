@@ -152,9 +152,10 @@ ConversionResult::Type DocumentDbColumn::PutInt16(
     case bsoncxx::type::k_date:
       value = static_cast< int16_t >(element.get_date().to_int64());
       break;
-    case bsoncxx::type::k_timestamp:
+    case bsoncxx::type::k_timestamp: {
+      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = static_cast< int16_t >(element.get_timestamp().timestamp);
-      break;
+    } break;
     case bsoncxx::type::k_null:
       break;
     default:
@@ -203,9 +204,10 @@ ConversionResult::Type DocumentDbColumn::PutInt32(
     case bsoncxx::type::k_date:
       value = static_cast< int32_t >(element.get_date().to_int64());
       break;
-    case bsoncxx::type::k_timestamp:
+    case bsoncxx::type::k_timestamp: {
+      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = static_cast< int32_t >(element.get_timestamp().timestamp);
-      break;
+    } break;
     case bsoncxx::type::k_null:
       break;
     default:
@@ -253,9 +255,10 @@ ConversionResult::Type DocumentDbColumn::PutInt64(
     case bsoncxx::type::k_date:
       value = element.get_date().to_int64();
       break;
-    case bsoncxx::type::k_timestamp:
+    case bsoncxx::type::k_timestamp: {
+      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = static_cast< int64_t >(element.get_timestamp().timestamp);
-      break;
+    } break;
     case bsoncxx::type::k_null:
       break;
     default:
@@ -296,9 +299,10 @@ ConversionResult::Type DocumentDbColumn::PutFloat(
     case bsoncxx::type::k_date:
       value = element.get_date().to_int64();
       break;
-    case bsoncxx::type::k_timestamp:
+    case bsoncxx::type::k_timestamp: {
+      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = element.get_timestamp().timestamp;
-      break;
+    } break;
     case bsoncxx::type::k_null:
       break;
     default:
@@ -339,9 +343,10 @@ ConversionResult::Type DocumentDbColumn::PutDouble(
     case bsoncxx::type::k_date:
       value = element.get_date().to_int64();
       break;
-    case bsoncxx::type::k_timestamp:
+    case bsoncxx::type::k_timestamp: {
+      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = element.get_timestamp().timestamp;
-      break;
+    } break;
     case bsoncxx::type::k_null:
       break;
     default:
@@ -419,6 +424,7 @@ ConversionResult::Type DocumentDbColumn::PutString(
       value = ToString(dateTime);
     } break;
     case bsoncxx::type::k_timestamp: {
+      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       // Number of (non-negative) seconds after Epoch.
       auto dateTime = ToPosixTime(element.get_timestamp().timestamp);
       value = ToString(dateTime);
@@ -498,6 +504,7 @@ ConversionResult::Type DocumentDbColumn::PutTime(
       value = Time(element.get_date().to_int64());
       break;
     case bsoncxx::type::k_timestamp: {
+      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       // Convert from seconds after Epoch
       auto milliSecsFromEpoch =
           std::chrono::duration_cast< std::chrono::milliseconds >(
@@ -533,6 +540,7 @@ ConversionResult::Type DocumentDbColumn::PutDate(
       value = Date(element.get_date().to_int64());
       break;
     case bsoncxx::type::k_timestamp: {
+      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       // Convert from seconds after Epoch
       auto milliSecsFromEpoch =
           std::chrono::duration_cast< std::chrono::milliseconds >(
@@ -568,11 +576,11 @@ ConversionResult::Type DocumentDbColumn::PutTimestamp(
       LOG_DEBUG_MSG("Reading date: " << element.get_date().to_int64())
       value = Timestamp(element.get_date().to_int64());
       break;
-    case bsoncxx::type::k_timestamp:
+    case bsoncxx::type::k_timestamp: {
       LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       // MongoDB Timestamp is the number of seconds since the epoch.
       value = Timestamp(element.get_timestamp().timestamp, 0);
-      break;
+    } break;
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
       // https://bitquill.atlassian.net/browse/AD-680

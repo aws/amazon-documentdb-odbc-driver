@@ -43,9 +43,9 @@ bool ToGmTime(time_t in, tm& out) {
   boost::posix_time::ptime in_ptime =
       boost::posix_time::from_time_t((time_t)in);
   out = boost::posix_time::to_tm(in_ptime);
-  LOG_DEBUG_MSG("Converted year: " << (out.tm_year + 1900) 
-      << " month: " << (out.tm_mon + 1)
-      << " day: " << out.tm_mday);
+  LOG_DEBUG_MSG("Converted year: " << (out.tm_year + 1900)
+                                   << " month: " << (out.tm_mon + 1)
+                                   << " day: " << out.tm_mday);
   return true;
 }
 
