@@ -18,9 +18,9 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <boost/date_time/date_facet.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "documentdb/odbc/documentdb_column.h"
-#include "documentdb/odbc/log.h"
 #include <documentdb/odbc/impl/interop/interop_stream_position_guard.h>
 #include "documentdb/odbc/utility.h"
 #include "bsoncxx/types.hpp"
@@ -153,7 +153,6 @@ ConversionResult::Type DocumentDbColumn::PutInt16(
       value = static_cast< int16_t >(element.get_date().to_int64());
       break;
     case bsoncxx::type::k_timestamp: {
-      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = static_cast< int16_t >(element.get_timestamp().timestamp);
     } break;
     case bsoncxx::type::k_null:
@@ -205,7 +204,6 @@ ConversionResult::Type DocumentDbColumn::PutInt32(
       value = static_cast< int32_t >(element.get_date().to_int64());
       break;
     case bsoncxx::type::k_timestamp: {
-      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = static_cast< int32_t >(element.get_timestamp().timestamp);
     } break;
     case bsoncxx::type::k_null:
@@ -256,7 +254,6 @@ ConversionResult::Type DocumentDbColumn::PutInt64(
       value = element.get_date().to_int64();
       break;
     case bsoncxx::type::k_timestamp: {
-      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = static_cast< int64_t >(element.get_timestamp().timestamp);
     } break;
     case bsoncxx::type::k_null:
@@ -300,7 +297,6 @@ ConversionResult::Type DocumentDbColumn::PutFloat(
       value = element.get_date().to_int64();
       break;
     case bsoncxx::type::k_timestamp: {
-      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = element.get_timestamp().timestamp;
     } break;
     case bsoncxx::type::k_null:
@@ -344,7 +340,6 @@ ConversionResult::Type DocumentDbColumn::PutDouble(
       value = element.get_date().to_int64();
       break;
     case bsoncxx::type::k_timestamp: {
-      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       value = element.get_timestamp().timestamp;
     } break;
     case bsoncxx::type::k_null:
@@ -375,6 +370,9 @@ boost::posix_time::ptime ToPosixTime(const uint32_t secsSinceEpoch) {
 
 std::string ToString(const boost::posix_time::ptime& dateTime) {
   std::ostringstream os;
+  static std::locale loc(
+      os.getloc(), new boost::posix_time::time_facet("%Y-%m-%d %H:%M:%S"));
+  os.imbue(loc);
   os << dateTime;
   return os.str();
 }
@@ -424,7 +422,6 @@ ConversionResult::Type DocumentDbColumn::PutString(
       value = ToString(dateTime);
     } break;
     case bsoncxx::type::k_timestamp: {
-      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       // Number of (non-negative) seconds after Epoch.
       auto dateTime = ToPosixTime(element.get_timestamp().timestamp);
       value = ToString(dateTime);
@@ -504,7 +501,6 @@ ConversionResult::Type DocumentDbColumn::PutTime(
       value = Time(element.get_date().to_int64());
       break;
     case bsoncxx::type::k_timestamp: {
-      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       // Convert from seconds after Epoch
       auto milliSecsFromEpoch =
           std::chrono::duration_cast< std::chrono::milliseconds >(
@@ -540,7 +536,6 @@ ConversionResult::Type DocumentDbColumn::PutDate(
       value = Date(element.get_date().to_int64());
       break;
     case bsoncxx::type::k_timestamp: {
-      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       // Convert from seconds after Epoch
       auto milliSecsFromEpoch =
           std::chrono::duration_cast< std::chrono::milliseconds >(
@@ -572,12 +567,10 @@ ConversionResult::Type DocumentDbColumn::PutTimestamp(
     case bsoncxx::type::k_int64:
       value = Timestamp(element.get_int64().value);
       break;
-    case bsoncxx::type::k_date:
-      LOG_DEBUG_MSG("Reading date: " << element.get_date().to_int64())
+    case bsoncxx::type::k_date: {
       value = Timestamp(element.get_date().to_int64());
-      break;
+    } break;
     case bsoncxx::type::k_timestamp: {
-      LOG_DEBUG_MSG("Reading timesamp: " << element.get_timestamp().timestamp)
       // MongoDB Timestamp is the number of seconds since the epoch.
       value = Timestamp(element.get_timestamp().timestamp, 0);
     } break;
