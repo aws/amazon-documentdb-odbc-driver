@@ -636,7 +636,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: AmazonDocumentDBConnector
-        path: src/power-bi-connector/AmazonDocumentDBConnector/AmazonDocumentDBConnector.mez
+        path: src/power-bi-connector/AmazonDocumentDBConnector.mez
     
 
 
