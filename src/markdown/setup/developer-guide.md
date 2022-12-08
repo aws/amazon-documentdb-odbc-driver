@@ -272,6 +272,7 @@ The project ensures quality through static and runtime components.
    1. /NXCOMPAT - [Compatible with Data Execution Prevention](https://learn.microsoft.com/en-us/cpp/build/reference/nxcompat-compatible-with-data-execution-prevention)
    1. /WX - [Treat linker warnings as errors](https://learn.microsoft.com/en-us/cpp/build/reference/wx-treat-linker-warnings-as-errors)
 1. ACAT scan - run manually before any release.
+1. `trufflehog` - run during GitHub workflow to detect possible passwords or secrets in source code.
 
 ### Runtime Components
 
