@@ -266,7 +266,7 @@ The project ensures quality through static and runtime components.
    1. /GS - [Buffer Security Check](https://learn.microsoft.com/en-us/cpp/build/reference/gs-buffer-security-check)
    1. /analyze - [Code analysis](https://learn.microsoft.com/en-us/cpp/build/reference/analyze-code-analysis)
    1. /DYNAMICBASE - [Use address space layout randomization](https://learn.microsoft.com/en-us/cpp/build/reference/dynamicbase-use-address-space-layout-randomization)
-   1. /WX - [Treat compiler warnings as errors](https://learn.microsoft.com/en-us/cpp/build/reference/wx-treat-linker-warnings-as-errors)
+   1. /WX - [Treat compiler warnings as errors](https://learn.microsoft.com/en-us/cpp/build/reference/compiler-option-warning-level)
 1. Windows linker flags
    1. /SAFESEH - [Image has Safe Exception Handlers](https://learn.microsoft.com/en-us/cpp/build/reference/safeseh-image-has-safe-exception-handlers)
    1. /NXCOMPAT - [Compatible with Data Execution Prevention](https://learn.microsoft.com/en-us/cpp/build/reference/nxcompat-compatible-with-data-execution-prevention)
