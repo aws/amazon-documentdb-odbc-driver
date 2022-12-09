@@ -5,19 +5,6 @@ shared AmazonDocumentDBConnector.UnitTest =
     Source = AmazonDocumentDBConnector.Contents("localhost", 27017, "odbc-test", false, null, null, false, null, null, null, null, null, null, 1000, "_default", false, "Error", null, true, "Primary", 0, null, 2000),
     odbc_test = Source{[Name="odbc-test",Kind="Schema"]}[Data],
     api_robustness_test_001 = odbc_test{[Name="api_robustness_test_001",Kind="Table"]}[Data],
-    
-
-    AllRowsSatisfyCondition = (table, condition) =>
-        let
-            Filter = Table.SelectRows(table, condition)
-        in
-            Table.RowCount(Filter) = Table.RowCount(table),
-
-    NRowsSatisfyCondition = (table, condition, n) => 
-        let
-            Filter = Table.SelectRows(table, condition)
-        in
-            Table.RowCount(Filter) = n,
 
     facts =
     {
