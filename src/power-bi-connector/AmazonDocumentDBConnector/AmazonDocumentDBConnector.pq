@@ -38,7 +38,6 @@ AmazonDocumentDBConnectorType = type function (
             Documentation.FieldCaption = "Allow Invalid HostNames",
             Documentation.FieldDescription = "Allow Invalid HostNames.  Default: false",
             Documentation.AllowedValues = {true, false},
-            Documentation.DefaultValue = {false},
             Documentation.SampleValues = { "true" },
             DataSource.Path = true
         ]),
@@ -52,7 +51,6 @@ AmazonDocumentDBConnectorType = type function (
             Documentation.FieldCaption = "Enable SSH tunnel",
             Documentation.FieldDescription = "Enable SSH tunnel.  Default: false",
             Documentation.AllowedValues = {true, false},
-            Documentation.DefaultValue = {false},
             Documentation.SampleValues = { "true" },
             DataSource.Path = true
         ]),
@@ -78,7 +76,6 @@ AmazonDocumentDBConnectorType = type function (
             Documentation.FieldCaption = "SSH Strict Host Key Check",
             Documentation.FieldDescription = "Disabling this option is less secure.  Default: true",
             Documentation.AllowedValues = {true, false},
-            Documentation.DefaultValue = {false},
             Documentation.SampleValues = { "true" },
             DataSource.Path = true
         ]),
@@ -91,9 +88,8 @@ AmazonDocumentDBConnectorType = type function (
         optional schema_scan_method as (type text meta [
             Documentation.FieldCaption = "Scan Method",
             Documentation.FieldDescription = "Scan Method.  Default: Random",
-            Documentation.AllowedValues = {"Random", "ID Forward", "ID Reverse", "All"},
-            Documentation.DefaultValue = {"Random"},
-            Documentation.SampleValues = { "Random" },
+            Documentation.AllowedValues = {"RANDOM", "ID_FORWARD", "ID_REVERSE", "ALL"},
+            Documentation.SampleValues = { "RANDOM" },
             DataSource.Path = true
         ]),
         optional schema_scan_limit as (type number meta [
@@ -112,7 +108,6 @@ AmazonDocumentDBConnectorType = type function (
             Documentation.FieldCaption = "Refresh Schema",
             Documentation.FieldDescription = "Caution use temporarly to refresh schema.  Default: false",
             Documentation.AllowedValues = {true, false},
-            Documentation.DefaultValue = {false},
             Documentation.SampleValues = { "true" },
             DataSource.Path = true
         ]),
@@ -120,7 +115,6 @@ AmazonDocumentDBConnectorType = type function (
             Documentation.FieldCaption = "Log Level",
             Documentation.FieldDescription = "Log Level.  Default: Error",
             Documentation.AllowedValues = {"Debug", "Info", "Error", "Off"},
-            Documentation.DefaultValue = {"Error"},
             Documentation.SampleValues = { "Error" },
             DataSource.Path = true
         ]),
@@ -135,13 +129,13 @@ AmazonDocumentDBConnectorType = type function (
             Documentation.FieldCaption = "Retry Reads",
             Documentation.FieldDescription = "Retry Reads. Default: true",
             Documentation.AllowedValues = {true, false},
-            Documentation.DefaultValue = {false},
             Documentation.SampleValues = { "true" },
             DataSource.Path = true
         ]),
         optional read_preference as (type text meta [
             Documentation.FieldCaption = "Read Preference",
             Documentation.FieldDescription = "Read Preference. Default: primary",
+            Documentation.AllowedValues = {"primary", "primaryPreferred", "secondary", "secondaryPreferred", "nearest"},
             Documentation.SampleValues = { "Primary" },
             DataSource.Path = true
         ]),
@@ -154,7 +148,7 @@ AmazonDocumentDBConnectorType = type function (
         optional replica_set as (type text meta [
             Documentation.FieldCaption = "Replica Set",
             Documentation.FieldDescription = "Replica Set. Default: None",
-            Documentation.SampleValues = { "rc:2" },
+            Documentation.SampleValues = { "rs0" },
             DataSource.Path = true
         ]),
         optional fetch_size as (type number meta [
