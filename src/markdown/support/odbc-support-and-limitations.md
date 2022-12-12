@@ -313,6 +313,15 @@ Although the code has support for macOS/Linux builds, it does not have proper in
 There is a limitation of how many SSH tunnel can be open for an EC2 machine. This will render the driver not be able to open a connection and query the data. Specifically on Power BI, if you query more than 15 tables. Power BI will spawn sub-process for each table to query the data. In our case will open 15 sub-process and will try to open 15 SSH-tunnel ( one for each process). One of the connection will fail and because of that Power BI will cancel the query for all the sub-process.
 
 To not have this kind of issue, it is recommended to change the following [setting](https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-evaluation-configuration#in-power-bi-desktop) to be below 14.
+
+### Update ODBC driver
+
+It is recommended to uninstall any older version before install a newer version.
+
+### MSAccess not able to connect
+
+Driver is retuning `SQL_OAC_LEVEL1` when MSAccess calls `SQLGetInfo` for `SQL_ODBC_API_CONFORMANCE` and then MSAccess
+calls `SQLDisconnect`.
 ## roadmap
 ### Dynamic Link of IODBC/UnixODBC
 Currently, the driver statically determines the size of SQLWCHAR based on the library it is compiled with.
