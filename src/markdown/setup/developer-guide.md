@@ -1,4 +1,5 @@
 # Development Environment
+
 ## Pre-requisites
 
 ### C/C++ Formatting
@@ -235,16 +236,48 @@ There are two ways to fix the issue.
       E.g. If is in another docker container `export LOCAL_DATABASE_HOST=<ip from the mongo docker container>` or if is your host machine `export LOCAL_DATABASE_HOST=host.docker.internal`.
    9. You are ready to run the tests.
       E.g. `/documentdb-odbc/build/odbc/bin/documentdb-odbc-tests --catch_system_errors=false`.
+
 ## Code Coverage
 
 ### MacOS/Linux
+
 To generate code coverage reports you to need to use the debug builds for macOS/Linux, run the tests and use `gcovr` to compile the report. For an installation guide and how to use it look at the official (documentation)[https://gcovr.com/en/stable/index.html].
 If you want to check a detailed report generate the with `--html-details` option.
 
 ### Windows
+
 OpenCppCoverage is used to generate code coverage for windows, for more information check it in the official (documentation)[https://github.com/OpenCppCoverage/OpenCppCoverage]
 
 ## Versioning
 
 1. To set the version of the ODBC driver, update the `src/ODBC_DRIVER_VERSION.txt` file with the appropriate version.
 1. To set the version of the JDBC drvier to download and embed, update the `src/JDBC_DRIVER_VERSION.txt` file to the appropriate version. 
+
+## Quality Components
+
+The project ensures quality through static and runtime components.
+
+### Static Components
+
+1. `cppcheck` during GitHub pull request workflow
+1. `.clang-format` - enforces intendentation and C++ style for each developer.
+1. Windows compiler flags 
+   1. /guard:cf - [Enable Control Flow Guard](https://learn.microsoft.com/en-us/cpp/build/reference/guard-enable-control-flow-guard)
+   1. /GS - [Buffer Security Check](https://learn.microsoft.com/en-us/cpp/build/reference/gs-buffer-security-check)
+   1. /analyze - [Code analysis](https://learn.microsoft.com/en-us/cpp/build/reference/analyze-code-analysis)
+   1. /DYNAMICBASE - [Use address space layout randomization](https://learn.microsoft.com/en-us/cpp/build/reference/dynamicbase-use-address-space-layout-randomization)
+   1. /WX - [Treat compiler warnings as errors](https://learn.microsoft.com/en-us/cpp/build/reference/compiler-option-warning-level)
+1. Windows linker flags
+   1. /SAFESEH - [Image has Safe Exception Handlers](https://learn.microsoft.com/en-us/cpp/build/reference/safeseh-image-has-safe-exception-handlers)
+   1. /NXCOMPAT - [Compatible with Data Execution Prevention](https://learn.microsoft.com/en-us/cpp/build/reference/nxcompat-compatible-with-data-execution-prevention)
+   1. /WX - [Treat linker warnings as errors](https://learn.microsoft.com/en-us/cpp/build/reference/wx-treat-linker-warnings-as-errors)
+1. ACAT scan - run manually before any release.
+1. `trufflehog` - run during GitHub workflow to detect possible passwords or secrets in source code.
+
+### Runtime Components
+
+1. `code coverage` - checks during GitHub pull request workflow
+1. `boost` - test platform framework.
+   1. The source project is `odbc-test`.
+   1. Test platform for unit and integration tests.
+   1. Checks for memory leaks and unhandled runtime exceptions.
