@@ -273,3 +273,54 @@ To specify an arbitrary NUMERIC or DECIMAL literal, quote the numeric expression
    quoted using string sytax:
    - `SELECT CAST('12345678901234567890.45' AS DECIMAL(20, 2)) AS "literalDecimal" 
   FROM table`
+
+## Known limitations
+
+
+### No support for Excel on macOS 
+Although it is possible to build the source code on macOS, it still needs changes to fully support Excel on macOS. For Excel on macOS to work, SQLDescribeCol (error is not about SQLDescribeCol) need to return TABLE_QUALIFIER and TABLE_OWNER (ODBC 2.0 naming) instead of TABLE_CAT and TABLE_SCHEME (our current naming, which is ODBC 3.0).
+Note that complete ODBC 2.0 support likely would be needed for the driver to work with Excel properly. 
+
+### No executable generated with jpackage 
+There is not binary generated during the jpackage process. This is currently limiting to the user use schema management command line interface. User still can use the schema management commang line interface using [java commands](https://github.com/aws/amazon-documentdb-jdbc-driver/blob/develop/src/markdown/schema/manage-schema-cli.md).
+
+### Tableau is not supported
+Out of the box, Tableau has a generic support for any ODBC driver. However, it’s mechanism for connecting is to invoke the DSN configuration dialog associated with the driver. It assumes all credentials are stored in the DSN settings, because it does not prompt for username/password. To fully support Tableau a custom ODBC connector to Tableau needs to be implemented.
+
+### No support for multithreading 
+There is a limitation when a second thread try to initialize/attach on the JVM.
+
+
+### Use of Amazon RDS CA certificate in driver
+Currently, the standard [Amazon RDS CA root certificate](https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem) is not being bunded with the ODBC driver.
+`tls_options.ca_file("path-to-file")` does not work as expected. Note that the Amazon RDS CA root certificate is used to get metadata through JNI/JDBC interface
+
+### defaultAuthDB not available on the DSN Configuration 
+Although defaultAuthDB is exposed on JDBC connection string. ODBC driver is not using this capability to connect to DocumentDB.
+
+
+### SQLCancel
+
+Support SQLCancel ODBC API.
+
+
+### No package/installers to macOS/Linux releases
+
+Although the code has support for macOS/Linux builds, it does not have proper installers for these platforms.
+
+### Limited number of concurrent SSH tunnel
+
+There is a limitation of how many SSH tunnel can be open for an EC2 machine. This will render the driver not be able to open a connection and query the data. Specifically on Power BI, if you query more than 15 tables. Power BI will spawn sub-process for each table to query the data. In our case will open 15 sub-process and will try to open 15 SSH-tunnel ( one for each process). One of the connection will fail and because of that Power BI will cancel the query for all the sub-process.
+
+To not have this kind of issue, it is recommended to change the following [setting](https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-evaluation-configuration#in-power-bi-desktop) to be below 14.
+## roadmap
+### Dynamic Link of IODBC/UnixODBC
+Currently, the driver statically determines the size of SQLWCHAR based on the library it is compiled with.
+•	unixODBC defines SQLWCHAR as unsigned short - i.e., UTF-16
+•	iODBC defines SQLWCHAR as wchar_t - i.e., UTF-32
+Here is a solution for detecting if the iODBC manager is being used to call the driver:https://github.com/dremio/flightsql-odbc/blob/156ac3d10703c00308ff707134d65b20dd362281/odbcabstraction/encoding.cc#L24
+
+### limit log size
+
+With Debug level of logging, running the odbc tests can produce a log file of minimum of 8 mb. If users set their driver to be debug level and forgot to change it back, their server could be filled with log files very quickly. 
+
