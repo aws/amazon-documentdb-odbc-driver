@@ -251,7 +251,25 @@ OpenCppCoverage is used to generate code coverage for windows, for more informat
 ## Versioning
 
 1. To set the version of the ODBC driver, update the `src/ODBC_DRIVER_VERSION.txt` file with the appropriate version.
-1. To set the version of the JDBC drvier to download and embed, update the `src/JDBC_DRIVER_VERSION.txt` file to the appropriate version. 
+2. To set the version of the JDBC drvier to download and embed, update the `src/JDBC_DRIVER_VERSION.txt` file to the appropriate version. 
+
+## Power BI Connector
+
+1. Install [VSCode Power Query
+   SDK](https://marketplace.visualstudio.com/items?itemName=PowerQuery.vscode-powerquery-sdk) documentation
+   ([reference](https://learn.microsoft.com/en-us/power-query/power-query-sdk-vs-code))
+2. Open the folder `src/power-bi-connector/AmazonDocumentDBConnector` in a new VScode window. **Note**: The Power Query
+   SDK will not work if you open the root directory of the Amazon DocumentDB ODBC driver
+
+### Run Power BI Connector Tests
+
+1. Build the project use the Terminal command ***Run build task...***, ***build: Build connector project using MakePQX***.
+1. Make sure to set the crendentials before running any tests
+   ([reference](https://learn.microsoft.com/en-us/power-query/power-query-sdk-vs-code#set-credential))
+1. Use the ***Run TestConnection function*** to ensure the connection is valid 
+   ([reference](https://learn.microsoft.com/en-us/power-query/power-query-sdk-vs-code#run-testconnection-function))
+2. Select the `AmazonDocumentDBConnector.query.pq` file and click on ***Evaluate Current File***
+   ([reference](https://learn.microsoft.com/en-us/power-query/power-query-sdk-vs-code#evaluate-a-query-and-the-results-panel))
 
 ## Quality Components
 
