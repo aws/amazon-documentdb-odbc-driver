@@ -1,3 +1,4 @@
+*.mez
 *.aps
 *.DS_Store
 *.obj
@@ -29,6 +30,8 @@ odbc_test_result.xml
 src/.vs/*
 # Visual Studio Code
 .vscode/*
+src/*/*/.vscode/
+src/*/*/bin/
 src/psqlodbc/psqlodbcBuilder/x64_*
 src/*/x64
 src/*/Win32
