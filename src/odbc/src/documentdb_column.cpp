@@ -253,9 +253,9 @@ ConversionResult::Type DocumentDbColumn::PutInt64(
     case bsoncxx::type::k_date:
       value = element.get_date().to_int64();
       break;
-    case bsoncxx::type::k_timestamp: {
+    case bsoncxx::type::k_timestamp:
       value = static_cast< int64_t >(element.get_timestamp().timestamp);
-    } break;
+      break;
     case bsoncxx::type::k_null:
       break;
     default:
@@ -296,9 +296,9 @@ ConversionResult::Type DocumentDbColumn::PutFloat(
     case bsoncxx::type::k_date:
       value = element.get_date().to_int64();
       break;
-    case bsoncxx::type::k_timestamp: {
+    case bsoncxx::type::k_timestamp:
       value = element.get_timestamp().timestamp;
-    } break;
+      break;
     case bsoncxx::type::k_null:
       break;
     default:
@@ -339,9 +339,9 @@ ConversionResult::Type DocumentDbColumn::PutDouble(
     case bsoncxx::type::k_date:
       value = element.get_date().to_int64();
       break;
-    case bsoncxx::type::k_timestamp: {
+    case bsoncxx::type::k_timestamp:
       value = element.get_timestamp().timestamp;
-    } break;
+      break;
     case bsoncxx::type::k_null:
       break;
     default:
