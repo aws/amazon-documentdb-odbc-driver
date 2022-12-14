@@ -291,7 +291,7 @@ There is not binary generated during the jpackage process. This is currently lim
 
 ### Tableau is not fully supported
 
-Out of the box, Tableau has a generic support for any ODBC driver. To fully support Tableau a custom ODBC connector to Tableau needs to be implemented.
+Out of the box, Tableau has a generic support for any ODBC driver. To fully support Tableau, a custom ODBC connector to Tableau needs to be implemented.
 
 ### No support for multithreading 
 
@@ -308,11 +308,11 @@ Although `defaultAuthDB` is exposed on JDBC connection string, the ODBC driver i
 
 ### SQLCancel is not supported
 
-Support SQLCancel ODBC API.
+SQLCancel ODBC API implementation is required for support.
 
 ### No package/installers to macOS/Linux releases
 
-Although the code has support for macOS/Linux builds, it does not have proper installers for these platforms.
+Although the code has support for macOS/Linux builds, the ODBC driver does not have proper installers for these platforms.
 
 ### Limited number of concurrent SSH tunnel
 
