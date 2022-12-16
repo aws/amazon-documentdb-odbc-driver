@@ -19,6 +19,7 @@
 #include <dlfcn.h>
 #include <ftw.h>
 #include <glob.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <documentdb/odbc/common/utils.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -31,9 +32,8 @@ namespace documentdb {
 namespace odbc {
 namespace common {
 time_t ToTimeGm(const tm& time) {
-  tm tmc = time;
-
-  return timegm(&tmc);
+  auto dateTime = boost::posix_time::ptime_from_tm(time);
+  return boost::posix_time::to_time_t(dateTime);
 }
 
 time_t ToTimeLocal(const tm& time) {
@@ -43,7 +43,10 @@ time_t ToTimeLocal(const tm& time) {
 }
 
 bool ToGmTime(time_t in, tm& out) {
-  return gmtime_r(&in, &out) != NULL;
+  boost::posix_time::ptime in_ptime =
+      boost::posix_time::from_time_t((time_t)in);
+  out = boost::posix_time::to_tm(in_ptime);
+  return true;
 }
 
 bool ToLocalTime(time_t in, tm& out) {

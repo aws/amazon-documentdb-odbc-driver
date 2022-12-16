@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   SQLLEN fieldObjectId_len = 0;
   bool fieldBoolean = false;
   SQLLEN fieldBoolean_len = 0;
-  DATE_STRUCT fieldDate{};
+  SQL_DATE_STRUCT fieldDate{};
   SQLLEN fieldDate_len = 0;
   SQLINTEGER fieldInt;
   SQLLEN fieldInt_len = 0;
@@ -231,6 +231,12 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   SQLLEN fieldNull_len = 0;
   SQLCHAR fieldBinary[buf_size];
   SQLLEN fieldBinary_len = 0;
+  SQL_DATE_STRUCT fieldTimestamp{};
+  SQLLEN fieldTimestamp_len = 0;
+  SQLWCHAR fieldDateAsString[buf_size];
+  SQLLEN fieldDateAsString_len = 0;
+  SQLWCHAR fieldTimestampAsString[buf_size];
+  SQLLEN fieldTimestampAsString_len = 0;
 
   // Fetch 1st row
   ret = SQLFetch(stmt);
@@ -274,6 +280,15 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   ret = SQLGetData(stmt, 13, SQL_C_BINARY, fieldBinary, sizeof(fieldBinary),
                    &fieldBinary_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 14, SQL_C_TYPE_DATE, &fieldTimestamp,
+                   sizeof(fieldTimestamp), &fieldTimestamp_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 14, SQL_C_WCHAR, fieldTimestampAsString,
+                   sizeof(fieldTimestampAsString), &fieldTimestampAsString_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLGetData(stmt, 7, SQL_C_WCHAR, fieldDateAsString,
+                   sizeof(fieldDateAsString), &fieldDateAsString_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   BOOST_CHECK_NE(SQL_NULL_DATA, id_len);
   BOOST_CHECK_EQUAL("62196dcc4d91892191475139",
@@ -294,7 +309,7 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldBoolean_len);
   BOOST_CHECK_EQUAL(true, fieldBoolean);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDate_len);
-  BOOST_CHECK_EQUAL(2020, fieldDate.year);
+  BOOST_CHECK_EQUAL(1920, fieldDate.year);
   BOOST_CHECK_EQUAL(1, fieldDate.month);
   BOOST_CHECK_EQUAL(1, fieldDate.day);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldInt_len);
@@ -313,6 +328,17 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingGetData) {
   BOOST_CHECK_EQUAL(fieldBinary[0], 0);
   BOOST_CHECK_EQUAL(fieldBinary[1], 1);
   BOOST_CHECK_EQUAL(fieldBinary[2], 2);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldTimestamp_len);
+  BOOST_CHECK_EQUAL(1971, fieldTimestamp.year);
+  BOOST_CHECK_EQUAL(12, fieldTimestamp.month);
+  BOOST_CHECK_EQUAL(31, fieldTimestamp.day);
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldTimestampAsString_len);
+  BOOST_CHECK_EQUAL("1971-12-31 23:59:59", utility::SqlWcharToString(fieldTimestampAsString,
+                                             fieldTimestampAsString_len, false));
+  BOOST_CHECK_NE(SQL_NULL_DATA, fieldDateAsString_len);
+  BOOST_CHECK_EQUAL("1920-01-01 00:00:00",
+                    utility::SqlWcharToString(fieldDateAsString,
+                                             fieldDateAsString_len, false));
 
   // Fetch 2nd row - not exist
   ret = SQLFetch(stmt);
@@ -344,7 +370,7 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
   SQLLEN fieldObjectId_len = 0;
   bool fieldBoolean = false;
   SQLLEN fieldBoolean_len = 0;
-  DATE_STRUCT fieldDate{};
+  SQL_DATE_STRUCT fieldDate{};
   SQLLEN fieldDate_len = 0;
   SQLINTEGER fieldInt;
   SQLLEN fieldInt_len = 0;
@@ -358,6 +384,8 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
   SQLLEN fieldNull_len = 0;
   SQLCHAR fieldBinary[buf_size];
   SQLLEN fieldBinary_len = 0;
+  SQL_DATE_STRUCT fieldTimestamp{};
+  SQLLEN fieldTimestamp_len = 0;
 
   ret = SQLBindCol(stmt, 1, SQL_C_WCHAR, id, sizeof(id), &id_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
@@ -397,6 +425,9 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
   ret = SQLBindCol(stmt, 13, SQL_C_BINARY, fieldBinary, sizeof(fieldBinary),
                    &fieldBinary_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
+  ret = SQLBindCol(stmt, 14, SQL_C_TYPE_DATE, &fieldTimestamp,
+                   sizeof(fieldTimestamp), &fieldTimestamp_len);
+  BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   // Fetch 1st row
   ret = SQLFetch(stmt);
@@ -421,7 +452,7 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldBoolean_len);
   BOOST_CHECK_EQUAL(true, fieldBoolean);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldDate_len);
-  BOOST_CHECK_EQUAL(2020, fieldDate.year);
+  BOOST_CHECK_EQUAL(1920, fieldDate.year);
   BOOST_CHECK_EQUAL(1, fieldDate.month);
   BOOST_CHECK_EQUAL(1, fieldDate.day);
   BOOST_CHECK_NE(SQL_NULL_DATA, fieldInt_len);
@@ -440,6 +471,9 @@ BOOST_AUTO_TEST_CASE(TestSingleResultUsingBindCol) {
   BOOST_CHECK_EQUAL(fieldBinary[0], 0);
   BOOST_CHECK_EQUAL(fieldBinary[1], 1);
   BOOST_CHECK_EQUAL(fieldBinary[2], 2);
+  BOOST_CHECK_EQUAL(1971, fieldTimestamp.year);
+  BOOST_CHECK_EQUAL(12, fieldTimestamp.month);
+  BOOST_CHECK_EQUAL(31, fieldTimestamp.day);
 
   // Fetch 2nd row - not exist
   ret = SQLFetch(stmt);
