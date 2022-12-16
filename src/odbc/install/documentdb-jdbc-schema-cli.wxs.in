@@ -12,6 +12,8 @@
   <?define JpInstallerVersion=200 ?>
   <?define JpCompressedMsi=yes ?>
 
+  <?include $(var.JpConfigDir)/overrides.wxi ?>
+
   <?ifdef JpAllowUpgrades ?>
     <?define JpUpgradeVersionOnlyDetectUpgrade="no"?>
   <?else?>
@@ -22,8 +24,6 @@
   <?else?>
     <?define JpUpgradeVersionOnlyDetectDowngrade="yes"?>
   <?endif?>
-
-  <?include $(var.JpConfigDir)/overrides.wxi ?>
 
   <Product
     Id="$(var.JpProductCode)"
@@ -72,8 +72,11 @@
       <ComponentGroupRef Id="Shortcuts"/>
       <ComponentGroupRef Id="Files"/>
       <ComponentGroupRef Id="FileAssociations"/>
-      <Component Id="pathEnvironmentVariable" Guid="@WIX_COMPONENT_ID_JVM_PATH_ENV_VAR@" Win64='@WIX_COMPONENT_IS_WIN64@' KeyPath="yes" Directory="TARGETDIR" >
-        <Environment Id="jvmPath" Name="Path" Value="[INSTALLDIR]bin\server" System="no" Permanent="no" Action="set" Part="last" Separator=";" />
+      <Component Id="environmentVariables" Guid="@WIX_COMPONENT_ID_JVM_PATH_ENV_VAR@" Win64="@WIX_COMPONENT_IS_WIN64@" KeyPath="yes" Directory="TARGETDIR" >
+        <!-- These environment variables are set at the system level (HKEY_LOCAL_MACHINE) because drivers are registered at system level, too. -->
+        <Environment Id="jvmPath" Name="Path" Value="[INSTALLDIR]runtime\bin\server" System="yes" Permanent="no" Action="set" Part="last" Separator=";" />
+        <Environment Id="sshTunnelPath" Name="DOCUMENTDB_SSH_TUNNEL_PATH" Value="[INSTALLDIR]@WIX_JDBC_INSTALLER_NAME@-@WIX_PACKAGE_PLATFORM@.exe" System="yes" Permanent="no" Action="set" Part="all" />
+        <Environment Id="documnentDbHome" Name="DOCUMENTDB_HOME" Action="set" System="yes" Part="all" Value="[INSTALLDIR]" />
       </Component>
     </Feature>
 
