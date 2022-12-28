@@ -244,13 +244,16 @@ AmazonDocumentDBConnectorImpl = (
 
         SqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
             SupportsTop = false,
+            PrepareStatements = false,
             LimitClauseKind = LimitClauseKind.LimitOffset,
             Sql92Conformance = ODBC[SQL_SC][SQL_SC_SQL92_FULL],
             SupportsNumericLiterals = true,
             SupportsStringLiterals = true,
             SupportsOdbcDateLiterals = true,
             SupportsOdbcTimeLiterals = true,
-            SupportsOdbcTimestampLiterals = true
+            SupportsOdbcTimestampLiterals = true,
+            StringLiteralEscapeCharacters = { "\" },
+            SupportsDerivedTable = true
         ]),
 
         // SQLColumns is a function handler that receives the results of an ODBC call to SQLColumns().
@@ -270,11 +273,12 @@ AmazonDocumentDBConnectorImpl = (
 
         SQLGetInfo = Diagnostics.LogValue("SQLGetInfo_Options", [
             SQL_AGGREGATE_FUNCTIONS = ODBC[SQL_AF][All],
-            SQL_SQL_CONFORMANCE = ODBC[SQL_SC][SQL_SC_SQL92_INTERMEDIATE]
+            SQL_SQL_CONFORMANCE = ODBC[SQL_SC][SQL_SC_SQL92_FULL]
         ]),
 
         SQLGetFunctions = Diagnostics.LogValue("SQLGetFunctions_Options", [
-            SQL_API_SQLBINDPARAMETER = false
+            SQL_API_SQLBINDPARAMETER = false,
+            SQL_CONVERT_FUNCTIONS = ODBC[SQL_FN_CVT][SQL_FN_CVT_CAST]
         ]),
 
         SQLGetTypeInfo = (types) => 
