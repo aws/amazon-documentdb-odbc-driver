@@ -2588,7 +2588,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_MAX_CONCURRENT_ACTIVITIES
   // The maximum number of active statements that the driver can  support for a
   // connection. Zero mean no limit.
-  shortParams[SQL_MAX_CONCURRENT_ACTIVITIES] = 0;  // I.e., no limit
+  shortParams[SQL_MAX_CONCURRENT_ACTIVITIES] = 1;  // I.e., only one.
 #endif  // SQL_MAX_CONCURRENT_ACTIVITIES
 
 #ifdef SQL_TXN_CAPABLE
