@@ -1,4 +1,4 @@
-// This file contains your Data Connector logic
+﻿// This file contains your Data Connector logic
 section AmazonDocumentDBConnector;
 
 // When set to true, additional trace information will be written out to the User log. 
@@ -25,7 +25,7 @@ Config_EnableDirectQuery = true;    // true, false
 
 /* This is the method for connection to ODBC*/
 [DataSource.Kind="AmazonDocumentDBConnector", Publish="AmazonDocumentDBConnector.UI"]
-shared AmazonDocumentDBConnector.Database = (dsn as text) as table =>
+shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
       let
         //
         // Connection string settings
@@ -131,11 +131,10 @@ AmazonDocumentDBConnector = [
             json = Json.Document(dataSourcePath),
             dsn = json[dsn]
         in
-            { "AmazonDocumentDBConnector.Database", dsn}, 
+            { "AmazonDocumentDBConnector.Contents", dsn}, 
  // Authentication Type
     Authentication = [
-        UsernamePassword = [],
-        Implicit = []
+        UsernamePassword = []
     ],
     Label = Extension.LoadString("DataSourceLabel")
 ];
