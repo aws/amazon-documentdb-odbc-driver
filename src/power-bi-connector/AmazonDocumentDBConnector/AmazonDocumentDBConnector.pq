@@ -44,11 +44,8 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
         Credential = Extension.CurrentCredential(),
         encryptionEnabled = Credential[EncryptConnection]? = true,
         CredentialConnectionString = [
-            SSLMode = if encryptionEnabled then "verify-full" else "require",
             UID = Credential[Username],
-            PWD = Credential[Password],
-            BoolsAsChar = 0,
-            MaxVarchar = 65535
+            PWD = Credential[Password]
         ],
         defaultConfig = BuildOdbcConfig(),
     
