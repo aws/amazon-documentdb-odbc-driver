@@ -49,7 +49,7 @@ jobs:
           path: ./
           base: ${{ github.event.repository.default_branch }}
           head: HEAD
-          extra_args: --debug --only-verified
+          extra_args: --debug --only-verified --since-commit HEAD
       - name: git secrets
         run: |
           git clone https://github.com/awslabs/git-secrets.git
