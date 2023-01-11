@@ -47,18 +47,31 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
             UID = Credential[Username],
             PWD = Credential[Password]
         ],
-        defaultConfig = BuildOdbcConfig(),
     
-        SqlCapabilities = defaultConfig[SqlCapabilities] & [
-        //add additional non-configuration handled overrides here
-        GroupByCapabilities = 2
+        MySqlCapabilities = [
+            //add additional non-configuration handled overrides here
+            GroupByCapabilities = Config_GroupByCapabilities,
+            SupportsNumericLiterals = true,
+            SupportsStringLiterals = true,                
+            SupportsOdbcDateLiterals = true,
+            SupportsOdbcTimeLiterals = true,
+            SupportsOdbcTimestampLiterals = true,
+            PrepareStatements = false,
+            StringLiteralEscapeCharacters = Config_StringLiterateEscapeCharacters,
+            SupportsTop = Config_SupportsTop,
+            LimitClauseKind = Config_LimitClauseKind,
+            FractionalSecondsScale = Config_FractionalSecondsScale
         ],
-        SQLGetInfo = defaultConfig[SQLGetInfo] & [
-        //add additional non-configuration handled overrides here
-        SQL_AGGREGATE_FUNCTIONS = 0xFF
+        MySQLGetInfo = [
+            //add additional non-configuration handled overrides here
+            SQL_SQL92_PREDICATES = Config_SQ_Predicates,
+            SQL_AGGREGATE_FUNCTIONS = Config_SQL_AF,
+            SQL_SQL_CONFORMANCE = Config_SqlConformance
         ],
-        SQLGetFunctions = defaultConfig[SQLGetFunctions] & [
-        //add additional non-configuration handled overrides here
+        MySQLGetFunctions = [
+            //add additional non-configuration handled overrides here
+            SQL_API_SQLBINDPARAMETER = false,
+            SQL_CONVERT_FUNCTIONS = 0x2 // CAST
         ],
 
         // Build AstVisitor
@@ -66,7 +79,7 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
         // operations. The most common usage is to define syntax for LIMIT/OFFSET operators 
         // when TOP is not supported. 
         // 
-        AstVisitor = [
+        MyAstVisitor = [
             LimitClause = (skip, take) =>
             let
                 offset = if (skip <> null and skip > 0) then Text.Format("OFFSET #{0} ROWS", {skip}) else "",
@@ -107,14 +120,16 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
             //Prevent exposure of Native Query
             HideNativeQuery = false,
             //Allows the M engine to select a compatible data type when conversion between two specific numeric types is not declared as supported in the SQL_CONVERT_* capabilities.
-            SoftNumbers = true,
+            // TODO: Try false 
+            SoftNumbers = false,
             TolerateConcatOverflow = true,
             // These values should be set by previous steps
             CredentialConnectionString = CredentialConnectionString,
             //Requires AstVisitor since Top is not supported in Postgres
-            AstVisitor = AstVisitor,
-            SqlCapabilities = SqlCapabilities,
-            SQLGetInfo = SQLGetInfo
+            AstVisitor = MyAstVisitor,
+            SqlCapabilities = MySqlCapabilities,
+            SQLGetInfo = MySQLGetInfo,
+            SQLGetFunctions = MySQLGetFunctions
         ])
         
     in OdbcDatasource;
@@ -152,140 +167,6 @@ AmazonDocumentDBConnector.Icons = [
     Icon16 = { Extension.Contents("AmazonDocumentDBConnector16.png"), Extension.Contents("AmazonDocumentDBConnector20.png"), Extension.Contents("AmazonDocumentDBConnector24.png"), Extension.Contents("AmazonDocumentDBConnector32.png") },
     Icon32 = { Extension.Contents("AmazonDocumentDBConnector32.png"), Extension.Contents("AmazonDocumentDBConnector40.png"), Extension.Contents("AmazonDocumentDBConnector48.png"), Extension.Contents("AmazonDocumentDBConnector64.png") }
 ];
-
-// build settings based on configuration variables
-BuildOdbcConfig = () as record =>
-    let        
-        defaultConfig = [
-            SqlCapabilities = [],
-            SQLGetFunctions = [],
-            SQLGetInfo = []
-        ],
-
-        withParams =
-            if (Config_UseParameterBindings = false) then
-                let 
-                    caps = defaultConfig[SqlCapabilities] & [ 
-                        SqlCapabilities = [
-                            SupportsNumericLiterals = true,
-                            SupportsStringLiterals = true,                
-                            SupportsOdbcDateLiterals = true,
-                            SupportsOdbcTimeLiterals = true,
-                            SupportsOdbcTimestampLiterals = true,
-                            PrepareStatements = false
-                        ]
-                    ],
-                    funcs = defaultConfig[SQLGetFunctions] & [
-                        SQLGetFunctions = [
-                            SQL_API_SQLBINDPARAMETER = false,
-                            SQL_CONVERT_FUNCTIONS = 0x2 // CAST
-                        ]
-                    ]
-                in
-                    defaultConfig & caps & funcs
-            else
-                defaultConfig,
-                
-        withEscape = 
-            if (Config_StringLiterateEscapeCharacters <> null) then 
-                let
-                    caps = withParams[SqlCapabilities] & [ 
-                        SqlCapabilities = [
-                            StringLiteralEscapeCharacters = Config_StringLiterateEscapeCharacters
-                        ]
-                    ]
-                in
-                    withParams & caps
-            else
-                withParams,
-
-        withTop =
-            let
-                caps = withEscape[SqlCapabilities] & [ 
-                    SqlCapabilities = [
-                        SupportsTop = Config_SupportsTop,
-                        LimitClauseKind = Config_LimitClauseKind
-                    ]
-                ]
-            in
-                withEscape & caps,
-
-        withGroup =
-            let
-                caps = withEscape[SqlCapabilities] & [ 
-                    SqlCapabilities = [
-                        GroupByCapabilities = Config_GroupByCapabilities
-                    ]
-                ]
-            in
-                withTop & caps,
-
-        withCastOrConvert = 
-            if (Config_UseCastInsteadOfConvert = true) then
-                let
-                    caps = withGroup[SQLGetFunctions] & [ 
-                        SQLGetFunctions = [
-                            SQL_CONVERT_FUNCTIONS = 0x2 /* SQL_FN_CVT_CAST */
-                        ]
-                    ]
-                in
-                    withGroup & caps
-            else
-                withGroup,
-
-        withSeconds = 
-            if (Config_FractionalSecondsScale <> null) then 
-                let
-                    caps = withCastOrConvert[SqlCapabilities] & [ 
-                        SqlCapabilities = [
-                            FractionalSecondsScale = Config_FractionalSecondsScale
-                        ]
-                    ]
-                in
-                    withCastOrConvert & caps
-            else
-                withCastOrConvert,
-
-        withPredicates =
-            if (Config_SQ_Predicates <> null) then
-                let
-                    caps = withSeconds[SQLGetInfo] & [
-                        SQLGetInfo = [
-                            SQL_SQL92_PREDICATES = Config_SQ_Predicates
-                        ]
-                    ]
-                in
-                    withSeconds & caps
-            else
-                withSeconds,
-
-        withAggregates = 
-            if (Config_SQL_AF <> null) then
-                let
-                    caps = withPredicates[SQLGetInfo] & [
-                        SQLGetInfo = [
-                            SQL_AGGREGATE_FUNCTIONS = Config_SQL_AF
-                        ]
-                    ]
-                in
-                    withPredicates & caps
-            else
-                withPredicates,
-
-        withSqlConformance =
-            if (Config_SqlConformance <> null) then
-                let
-                    caps = withAggregates[SQLGetInfo] & [
-                        SQLGetInfo = [
-                            SQL_SQL_CONFORMANCE = Config_SqlConformance
-                        ]
-                    ]
-                in
-                    withAggregates & caps
-            else
-                withAggregates
-    in
-        withSqlConformance;
 
 // 
 // Load common library functions

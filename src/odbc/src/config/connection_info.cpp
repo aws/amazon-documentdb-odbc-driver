@@ -738,7 +738,8 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_EXPRESSIONS_IN_ORDERBY
   // A character string: "Y" if the data source supports expressions in the
   // ORDER BY list; "N" if it does not.
-  strParams[SQL_EXPRESSIONS_IN_ORDERBY] = "Y";
+  // TODO: GetInfo investigate - should not support expressions in ORDER BY list.
+  strParams[SQL_EXPRESSIONS_IN_ORDERBY] = "N";
 #endif  // SQL_EXPRESSIONS_IN_ORDERBY
 
 #ifdef SQL_INTEGRITY
@@ -816,7 +817,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // A character string: "Y" if the columns in the ORDER BY clause must be in
   // the select list; otherwise, "N".
   // TODO: GetInfo investigate - should be "Y"
-  strParams[SQL_ORDER_BY_COLUMNS_IN_SELECT] = "N";
+  strParams[SQL_ORDER_BY_COLUMNS_IN_SELECT] = "Y";
 #endif  // SQL_ORDER_BY_COLUMNS_IN_SELECT
 
 #ifdef SQL_PROCEDURE_TERM
@@ -1139,7 +1140,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Bitmask enumerating the scalar conversion functions supported by the driver
   // and associated data source.
   // TODO: GetInfo investigate!!!!!!!
-  intParams[SQL_CONVERT_FUNCTIONS] = SQL_FN_CVT_CONVERT | SQL_FN_CVT_CAST;
+  intParams[SQL_CONVERT_FUNCTIONS] = SQL_FN_CVT_CAST;
 #endif  // SQL_CONVERT_FUNCTIONS
 
 #ifdef SQL_OJ_CAPABILITIES
@@ -1509,7 +1510,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //     together with the complete parameter array as one atomic unit. Errors
   //     are handled the same as if one statement were executed.
   // TODO: GetInfo investigate - try SQL_PARC_NO_BATCH
-  intParams[SQL_PARAM_ARRAY_ROW_COUNTS] = SQL_PARC_BATCH;
+  intParams[SQL_PARAM_ARRAY_ROW_COUNTS] = SQL_PARC_NO_BATCH;
 #endif  // SQL_PARAM_ARRAY_ROW_COUNTS
 
 #ifdef SQL_PARAM_ARRAY_SELECTS
@@ -2632,6 +2633,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // columns: SQL_CB_NULL = Result is NULL valued. SQL_CB_NON_NULL = Result is
   // concatenation of non - NULL valued column or columns. An SQL - 92 Entry
   // level-conformant driver will always return SQL_CB_NULL.
+  // TODO: GetInfo investigate - behaviour is likely SQL_CB_NON_NULL
   shortParams[SQL_CONCAT_NULL_BEHAVIOR] = SQL_CB_NULL;
 #endif  // SQL_CONCAT_NULL_BEHAVIOR
 
