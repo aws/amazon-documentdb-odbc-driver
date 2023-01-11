@@ -8,20 +8,6 @@ section AmazonDocumentDBConnector;
 EnableTraceOutput = true;
 
 Config_DriverName = "Amazon DocumentDB";
-Config_SqlConformance = 8;  // (SQL_SC) null, 1, 2, 4, 8
-Config_GroupByCapabilities = 2; // (SQL_GB) 0, 1, 2, 3, 4
-Config_FractionalSecondsScale = 3; //set
-Config_SupportsTop = false; // true, false
-Config_LimitClauseKind = LimitClauseKind.LimitOffset;
-Config_DefaultUsernamePasswordHandling = true;  // true, false
-Config_UseParameterBindings = false;  // true, false, null
-Config_StringLiterateEscapeCharacters  = { "\" }; // ex. { "\" }
-Config_UseCastInsteadOfConvert = true; // true, false, null
-Config_SQ_Predicates = 0x0000FFFF; // (SQL_SP) all
-Config_SQL_AF = 0xFF; //all
-Config_EnableDirectQuery = true;    // true, false
-
-
 
 /* This is the method for connection to ODBC*/
 [DataSource.Kind="AmazonDocumentDBConnector", Publish="AmazonDocumentDBConnector.UI"]
@@ -48,31 +34,28 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
             PWD = Credential[Password]
         ],
     
-        MySqlCapabilities = [
-            //add additional non-configuration handled overrides here
-            GroupByCapabilities = Config_GroupByCapabilities,
+        MySqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
+            GroupByCapabilities = 0x2,
             SupportsNumericLiterals = true,
             SupportsStringLiterals = true,                
             SupportsOdbcDateLiterals = true,
             SupportsOdbcTimeLiterals = true,
             SupportsOdbcTimestampLiterals = true,
             PrepareStatements = false,
-            StringLiteralEscapeCharacters = Config_StringLiterateEscapeCharacters,
-            SupportsTop = Config_SupportsTop,
-            LimitClauseKind = Config_LimitClauseKind,
-            FractionalSecondsScale = Config_FractionalSecondsScale
-        ],
-        MySQLGetInfo = [
-            //add additional non-configuration handled overrides here
-            SQL_SQL92_PREDICATES = Config_SQ_Predicates,
-            SQL_AGGREGATE_FUNCTIONS = Config_SQL_AF,
-            SQL_SQL_CONFORMANCE = Config_SqlConformance
-        ],
-        MySQLGetFunctions = [
-            //add additional non-configuration handled overrides here
+            StringLiteralEscapeCharacters = { "\" },
+            SupportsTop = false,
+            LimitClauseKind = LimitClauseKind.LimitOffset,
+            FractionalSecondsScale = 3
+        ]),
+        MySQLGetInfo = Diagnostics.LogValue("SQLGetInfo_Options", [
+            SQL_SQL92_PREDICATES = 0x0000FFFF, // (SQL_SP) all
+            SQL_AGGREGATE_FUNCTIONS = 0xFF, //all
+            SQL_SQL_CONFORMANCE = 0x8 // FULL
+        ]),
+        MySQLGetFunctions = Diagnostics.LogValue("SQLGetFunctions_Options", [
             SQL_API_SQLBINDPARAMETER = false,
             SQL_CONVERT_FUNCTIONS = 0x2 // CAST
-        ],
+        ]),
 
         // Build AstVisitor
         // This record allows you to customize the generated SQL for certain
@@ -109,7 +92,6 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
         // Call to Odbc.DataSource
         //
         OdbcDatasource = Odbc.DataSource(ConnectionString, [
-
             // Enables client side connection pooling for the ODBC driver.
             // Most drivers will want to set this value to true.
             ClientConnectionPooling = true,
@@ -117,15 +99,14 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
             // will be organized by Database -> Schema -> Table. When set to false,
             // all tables will be displayed in a flat list using fully qualified names. 
             HierarchicalNavigation = true,
-            //Prevent exposure of Native Query
+            //Expose Native Query
             HideNativeQuery = false,
             //Allows the M engine to select a compatible data type when conversion between two specific numeric types is not declared as supported in the SQL_CONVERT_* capabilities.
-            // TODO: Try false 
-            SoftNumbers = false,
+            SoftNumbers = true,
             TolerateConcatOverflow = true,
             // These values should be set by previous steps
             CredentialConnectionString = CredentialConnectionString,
-            //Requires AstVisitor since Top is not supported in Postgres
+            //Requires AstVisitor since Top is not supported in DocumentDB
             AstVisitor = MyAstVisitor,
             SqlCapabilities = MySqlCapabilities,
             SQLGetInfo = MySQLGetInfo,
