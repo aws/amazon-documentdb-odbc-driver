@@ -17,5 +17,6 @@
       "name": "mongo-cxx-driver",
       "version": "3.6.5#3"
     }
-  ]
+  ],
+  "builtin-baseline": "c30de8e1369e03f4a569f8f224eed418dd0949bb"
 }
