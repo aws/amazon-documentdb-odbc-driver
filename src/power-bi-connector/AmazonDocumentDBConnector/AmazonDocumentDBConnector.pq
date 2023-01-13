@@ -17,7 +17,7 @@ shared AmazonDocumentDB.Contents = Value.ReplaceType(AmazonDocumentDBImpl, Amazo
 
 // Wrapper function to provide additional UI customization.
 AmazonDocumentDBType = type function (
-        DSN as (type text meta [
+        dsn as (type text meta [
             Documentation.FieldCaption = "DSN",
             Documentation.FieldDescription = "DocumentDB DSN.",
             Documentation.SampleValues = { "Data Source Name" }
