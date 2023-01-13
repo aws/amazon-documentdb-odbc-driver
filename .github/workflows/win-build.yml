@@ -167,7 +167,7 @@ jobs:
       shell: pwsh
       run: |
         . ./scripts/functions_win.ps1
-        Install-VcpkgPackages
+        Install-VcpkgPackages  -Triplet x86-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
 
@@ -352,7 +352,7 @@ jobs:
       shell: pwsh
       run: |
         . ./scripts/functions_win.ps1
-        Install-VcpkgPackages
+        Install-VcpkgPackages -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
 
@@ -513,7 +513,7 @@ jobs:
       shell: pwsh
       run: |
         . ./scripts/functions_win.ps1
-        Install-VcpkgPackages
+        Install-VcpkgPackages -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
 
