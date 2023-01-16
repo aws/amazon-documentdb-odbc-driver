@@ -1,5 +1,6 @@
 ﻿// This file contains your Data Connector logic
-section AmazonDocumentDBConnector;
+[Version = "1.0.0"]
+section AmazonDocumentDB;
 
 // When set to true, additional trace information will be written out to the User log. 
 // This should be set to false before release. Tracing is done through a call to 
@@ -10,8 +11,23 @@ EnableTraceOutput = true;
 Config_DriverName = "Amazon DocumentDB";
 
 /* This is the method for connection to ODBC*/
-[DataSource.Kind="AmazonDocumentDBConnector", Publish="AmazonDocumentDBConnector.UI"]
-shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
+[DataSource.Kind="AmazonDocumentDB", Publish="AmazonDocumentDB.UI"]
+
+shared AmazonDocumentDB.Contents = Value.ReplaceType(AmazonDocumentDBImpl, AmazonDocumentDBType);
+
+// Wrapper function to provide additional UI customization.
+AmazonDocumentDBType = type function (
+        dsn as (type text meta [
+            Documentation.FieldCaption = "DSN",
+            Documentation.FieldDescription = "DocumentDB DSN.",
+            Documentation.SampleValues = { "Data Source Name" }
+        ])
+    )
+    as table meta [
+        Documentation.Name = "Amazon DocumentDB"
+    ];
+
+AmazonDocumentDBImpl = (dsn as text) as table =>
       let
         //
         // Connection string settings
@@ -118,14 +134,14 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
 
 
 // Data Source Kind description
-AmazonDocumentDBConnector = [
+AmazonDocumentDB = [
  // Test Connection
     TestConnection = (dataSourcePath) => 
         let
             json = Json.Document(dataSourcePath),
             dsn = json[dsn]
         in
-            { "AmazonDocumentDBConnector.Contents", dsn}, 
+            { "AmazonDocumentDB.Contents", dsn}, 
  // Authentication Type
     Authentication = [
         UsernamePassword = []
@@ -134,18 +150,18 @@ AmazonDocumentDBConnector = [
 ];
 
 // Data Source UI publishing description
-AmazonDocumentDBConnector.UI = [
+AmazonDocumentDB.UI = [
     Beta = true,
     Category = "Database",
     ButtonText = { Extension.LoadString("ButtonTitle"), Extension.LoadString("ButtonHelp") },
-    LearnMoreUrl = "https://powerbi.microsoft.com/",
-    SourceImage = AmazonDocumentDBConnector.Icons,
-    SourceTypeImage = AmazonDocumentDBConnector.Icons,
+    LearnMoreUrl = "https://aws.amazon.com/documentdb/",
+    SourceImage = AmazonDocumentDB.Icons,
+    SourceTypeImage = AmazonDocumentDB.Icons,
     // This is for Direct Query Support
     SupportsDirectQuery = true
 ];
 
-AmazonDocumentDBConnector.Icons = [
+AmazonDocumentDB.Icons = [
     Icon16 = { Extension.Contents("AmazonDocumentDBConnector16.png"), Extension.Contents("AmazonDocumentDBConnector20.png"), Extension.Contents("AmazonDocumentDBConnector24.png"), Extension.Contents("AmazonDocumentDBConnector32.png") },
     Icon32 = { Extension.Contents("AmazonDocumentDBConnector32.png"), Extension.Contents("AmazonDocumentDBConnector40.png"), Extension.Contents("AmazonDocumentDBConnector48.png"), Extension.Contents("AmazonDocumentDBConnector64.png") }
 ];
