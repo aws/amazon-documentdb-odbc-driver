@@ -35,7 +35,7 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
         ],
     
         MySqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
-            GroupByCapabilities = 0x2,
+            GroupByCapabilities = ODBC[SQL_GB][SQL_GB_GROUP_BY_CONTAINS_SELECT],
             SupportsNumericLiterals = true,
             SupportsStringLiterals = true,                
             SupportsOdbcDateLiterals = true,
@@ -48,9 +48,10 @@ shared AmazonDocumentDBConnector.Contents = (dsn as text) as table =>
             FractionalSecondsScale = 3
         ]),
         MySQLGetInfo = Diagnostics.LogValue("SQLGetInfo_Options", [
-            SQL_SQL92_PREDICATES = 0x0000FFFF, // (SQL_SP) all
+            SQL_SQL92_PREDICATES = ODBC[SQL_SP][All], // (SQL_SP) all
             SQL_AGGREGATE_FUNCTIONS = 0xFF, //all
-            SQL_SQL_CONFORMANCE = 0x8 // FULL
+            SQL_SQL_CONFORMANCE = 0x8, // FULL
+            SQL_GROUP_BY = ODBC[SQL_GB][SQL_GB_GROUP_BY_CONTAINS_SELECT]
         ]),
         MySQLGetFunctions = Diagnostics.LogValue("SQLGetFunctions_Options", [
             SQL_API_SQLBINDPARAMETER = false,

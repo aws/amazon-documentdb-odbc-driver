@@ -1017,12 +1017,12 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Indicates the level of the ODBC 3.x interface that the driver
   // complies with.
   // TODO: GetInfo investigate - SQL_OIC_LEVEL1
-  intParams[SQL_ODBC_INTERFACE_CONFORMANCE] = SQL_OIC_CORE;
+  intParams[SQL_ODBC_INTERFACE_CONFORMANCE] = SQL_OIC_LEVEL1;
 #endif  // SQL_ODBC_INTERFACE_CONFORMANCE
 
 #ifdef SQL_SQL_CONFORMANCE
   // Indicates the level of SQL-92 supported by the driver.
-  intParams[SQL_SQL_CONFORMANCE] = SQL_SC_SQL92_ENTRY;
+  intParams[SQL_SQL_CONFORMANCE] = SQL_SC_SQL92_FULL;
 #endif  // SQL_SQL_CONFORMANCE
 
 #ifdef SQL_CATALOG_USAGE
@@ -2455,7 +2455,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // driver complies with: SQL_SCC_XOPEN_CLI_VERSION1: The driver complies with
   // the Open Group CLI version 1. SQL_SCC_ISO92_CLI: The driver complies with
   // the ISO 92 CLI.
-  intParams[SQL_STANDARD_CLI_CONFORMANCE] = 0;  // I.e., not supported
+  intParams[SQL_STANDARD_CLI_CONFORMANCE] = SQL_SCC_ISO92_CLI;
 #endif  // SQL_STANDARD_CLI_CONFORMANCE
 
 #ifdef SQL_SUBQUERIES
@@ -2471,7 +2471,9 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // support subqueries support correlated subqueries. An SQL-92 Entry
   // level-conformant driver will always return a bitmask in which all of these
   // bits are set.
-  intParams[SQL_SUBQUERIES] = 0;  // I.e., not supported
+  intParams[SQL_SUBQUERIES] = SQL_SQ_CORRELATED_SUBQUERIES | SQL_SQ_COMPARISON
+                              | SQL_SQ_EXISTS | SQL_SQ_IN
+                              | SQL_SQ_QUANTIFIED;
 #endif  // SQL_SUBQUERIES
 
 #ifdef SQL_TXN_ISOLATION_OPTION
@@ -2543,7 +2545,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_OSC_MINIMUM = Minimum grammar supported
   // SQL_OSC_CORE = Core grammar supported
   // SQL_OSC_EXTENDED = Extended grammar supported
-  intParams[SQL_ODBC_SQL_CONFORMANCE] = SQL_OSC_CORE;
+  intParams[SQL_ODBC_SQL_CONFORMANCE] = SQL_OSC_EXTENDED;
 #endif  // SQL_ODBC_SQL_CONFORMANCE
 
 #ifdef SQL_POSITIONED_STATEMENTS
@@ -2634,7 +2636,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // concatenation of non - NULL valued column or columns. An SQL - 92 Entry
   // level-conformant driver will always return SQL_CB_NULL.
   // TODO: GetInfo investigate - behaviour is likely SQL_CB_NON_NULL
-  shortParams[SQL_CONCAT_NULL_BEHAVIOR] = SQL_CB_NULL;
+  shortParams[SQL_CONCAT_NULL_BEHAVIOR] = SQL_CB_NON_NULL;
 #endif  // SQL_CONCAT_NULL_BEHAVIOR
 
 #ifdef SQL_CORRELATION_NAME
@@ -2705,7 +2707,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // supported. If none of the options is supported, the GROUP BY clause is not
   // supported by the data source.
   // TODO: GetInfo investigate SQL_GB_NO_RELATION
-  shortParams[SQL_GROUP_BY] = SQL_GB_GROUP_BY_EQUALS_SELECT;
+  shortParams[SQL_GROUP_BY] = SQL_GB_GROUP_BY_CONTAINS_SELECT;
 #endif  // SQL_GROUP_BY
 
 #ifdef SQL_IDENTIFIER_CASE
