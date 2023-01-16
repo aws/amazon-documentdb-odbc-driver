@@ -1,4 +1,4 @@
-name: ODBC Driver for Windows
+name: Signing ODBC Driver for Windows
 
 on:
   workflow_dispatch:
