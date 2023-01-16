@@ -3,7 +3,6 @@ name: Signing ODBC Driver for Windows
 on:
   workflow_dispatch:
 
-
 env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
