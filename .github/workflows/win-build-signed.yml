@@ -358,6 +358,3 @@ jobs:
           path: |
             ./odbc_test_result.xml
             ./build/odbc/logs/docdb_odbc_*.log
-
-
-
