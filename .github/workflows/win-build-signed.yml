@@ -29,7 +29,6 @@ env:
 jobs:
   build-windows32:
     runs-on: windows-2022
-    needs: trufflehog-git-secrets-scan
     steps:
       - uses: actions/checkout@v2
       - name: Update environment with ODBC_DRIVER_VERSION
@@ -182,7 +181,6 @@ jobs:
             ./build/odbc/logs/docdb_odbc_*.log
   build-windows64:
     runs-on: windows-2022
-    needs: trufflehog-git-secrets-scan
     steps:
       - uses: actions/checkout@v2
       - uses: aws-actions/configure-aws-credentials@v1
