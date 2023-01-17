@@ -661,7 +661,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // A character string: "Y" if the data source needs the length of a long data
   // value (the data type is SQL_LONGVARCHAR, SQL_LONGVARBINARY) before that
   // value is sent to the data source, "N" if it does not.
-  // TODO: GetInfo investigate - this should be "N"
   strParams[SQL_NEED_LONG_DATA_LEN] = "Y";
 #endif  // SQL_NEED_LONG_DATA_LEN
 
@@ -738,7 +737,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_EXPRESSIONS_IN_ORDERBY
   // A character string: "Y" if the data source supports expressions in the
   // ORDER BY list; "N" if it does not.
-  // TODO: GetInfo investigate - should not support expressions in ORDER BY list.
   strParams[SQL_EXPRESSIONS_IN_ORDERBY] = "N";
 #endif  // SQL_EXPRESSIONS_IN_ORDERBY
 
@@ -788,8 +786,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // the percent character (%) and underscore character (_) in a LIKE predicate
   // and the driver supports the ODBC syntax for defining a LIKE predicate
   // escape character; "N" otherwise.
-  // TODO: GetInfo investigate "Y"SQL_MAX_ASYNC_CONCURRENT_STATEMENTS
-  strParams[SQL_LIKE_ESCAPE_CLAUSE] = "N";
+  strParams[SQL_LIKE_ESCAPE_CLAUSE] = "Y";
 #endif  // SQL_LIKE_ESCAPE_CLAUSE
 
 #ifdef SQL_MAX_ROW_SIZE_INCLUDES_LONG
@@ -809,14 +806,12 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // A character string: "Y" if the driver supports more than one active
   // transaction at the same time, "N" if only one transaction can be active at
   // any time.
-  // TODO: GetInfo investigate - this should be "N"
-  strParams[SQL_MULTIPLE_ACTIVE_TXN] = "Y";
+  strParams[SQL_MULTIPLE_ACTIVE_TXN] = "N";
 #endif  // SQL_MULTIPLE_ACTIVE_TXN
 
 #ifdef SQL_ORDER_BY_COLUMNS_IN_SELECT
   // A character string: "Y" if the columns in the ORDER BY clause must be in
   // the select list; otherwise, "N".
-  // TODO: GetInfo investigate - should be "Y"
   strParams[SQL_ORDER_BY_COLUMNS_IN_SELECT] = "Y";
 #endif  // SQL_ORDER_BY_COLUMNS_IN_SELECT
 
@@ -930,7 +925,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //     SQLExecute or SQLExecDirect. If row counts are available, they can be
   //     rolled up or individually available, depending on the SQL_BRC_ROLLED_UP
   //     bit.
-  // TODO: GetInfo investigate
   intParams[SQL_BATCH_ROW_COUNT] = SQL_BRC_ROLLED_UP | SQL_BRC_EXPLICIT;
 #endif  // SQL_BATCH_ROW_COUNT
 
@@ -949,7 +943,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_BS_ROW_COUNT_PROC = The driver supports explicit procedures that can
   // have row - count generating
   //     statements.
-  // TODO: GetInfo investigate
   intParams[SQL_BATCH_SUPPORT] = 0;  // I.e., not supported
 #endif  // SQL_BATCH_SUPPORT
 
@@ -1016,7 +1009,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_ODBC_INTERFACE_CONFORMANCE
   // Indicates the level of the ODBC 3.x interface that the driver
   // complies with.
-  // TODO: GetInfo investigate - SQL_OIC_LEVEL1
   intParams[SQL_ODBC_INTERFACE_CONFORMANCE] = SQL_OIC_LEVEL1;
 #endif  // SQL_ODBC_INTERFACE_CONFORMANCE
 
@@ -1139,14 +1131,12 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_CONVERT_FUNCTIONS
   // Bitmask enumerating the scalar conversion functions supported by the driver
   // and associated data source.
-  // TODO: GetInfo investigate!!!!!!!
   intParams[SQL_CONVERT_FUNCTIONS] = SQL_FN_CVT_CAST;
 #endif  // SQL_CONVERT_FUNCTIONS
 
 #ifdef SQL_OJ_CAPABILITIES
   // Bitmask enumerating the types of outer joins supported by the driver and
   // data source.
-  // TODO: GetInfo investigate SQL_OJ_INNER SQL_OJ_NESTED - or NONE we don't support OUTER JOIN
   intParams[SQL_OJ_CAPABILITIES] =
       SQL_OJ_LEFT | SQL_OJ_NOT_ORDERED | SQL_OJ_ALL_COMPARISON_OPS;
 #endif  // SQL_OJ_CAPABILITIES
@@ -1509,7 +1499,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //     parameters. This is conceptually equivalent to treating the statement
   //     together with the complete parameter array as one atomic unit. Errors
   //     are handled the same as if one statement were executed.
-  // TODO: GetInfo investigate - try SQL_PARC_NO_BATCH
   intParams[SQL_PARAM_ARRAY_ROW_COUNTS] = SQL_PARC_NO_BATCH;
 #endif  // SQL_PARAM_ARRAY_ROW_COUNTS
 
@@ -1744,7 +1733,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_CT_CONSTRAINT_INITIALLY_IMMEDIATE (Full level)
   // SQL_CT_CONSTRAINT_DEFERRABLE (Full level)
   // SQL_CT_CONSTRAINT_NON_DEFERRABLE (Full level)
-  // TODO: GetInfo investigate!!!!!!!!!
   intParams[SQL_CREATE_TABLE] = SQL_CT_CREATE_TABLE | SQL_CT_COLUMN_CONSTRAINT;
 #endif  // SQL_CREATE_TABLE
 
@@ -1778,9 +1766,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   intParams[SQL_CREATE_VIEW] = 0;  // I.e., not supported
 #endif  // SQL_CREATE_VIEW
 
-  // TODO: SQL_CURSOR_COMMIT_BEHAVIOR
-  // TODO: SQL_CURSOR_ROLLBACK_BEHAVIOR
-
 #ifdef SQL_CURSOR_SENSITIVITY
   // Value that indicates the support for cursor sensitivity:
   // SQL_INSENSITIVE = All cursors on the statement handle show the result set
@@ -1799,7 +1784,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // An SQL - 92 Entry level-conformant driver will always return the
   // SQL_UNSPECIFIED option as supported. An SQL - 92 Full level-conformant
   // driver will always return the SQL_INSENSITIVE option as supported.
-  // TODO: GetInfo investigate
   intParams[SQL_CURSOR_SENSITIVITY] = SQL_INSENSITIVE;
 #endif  // SQL_CURSOR_SENSITIVITY
 
@@ -1836,7 +1820,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // possible. Phantoms are possible SQL_TXN_SERIALIZABLE = Transactions are
   // serializable. Serializable transactions do not allow dirty
   //     reads, nonrepeatable reads, or phantoms.
-  // TODO: GetInfo should be zero (0) - transactions not supported.
   intParams[SQL_DEFAULT_TXN_ISOLATION] = SQL_TXN_REPEATABLE_READ;
 #endif  // SQL_DEFAULT_TXN_ISOLATION
 
@@ -1991,7 +1974,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // statement. Because this does not directly determine the underlying SQL
   // support, however, scrollable cursors may not be supported, even for an
   // SQL-92 Intermediate level-conformant driver.
-  // TODO: GetInfo investigate - try zero (0) - unsupported?
   intParams[SQL_DYNAMIC_CURSOR_ATTRIBUTES1] = SQL_CA1_NEXT;
 #endif  // SQL_DYNAMIC_CURSOR_ATTRIBUTES1
 
@@ -2277,7 +2259,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // FETCH statement. Because this does not directly determine the underlying
   // SQL support, however, scrollable cursors may not be supported, even for an
   // SQL-92 Intermediate level-conformant driver.
-  // TODO: GetInfo investigate zero (0)
   intParams[SQL_KEYSET_CURSOR_ATTRIBUTES1] = SQL_CA1_NEXT;
 #endif  // SQL_KEYSET_CURSOR_ATTRIBUTES1
 
@@ -2314,7 +2295,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Value that specifies the maximum number of active concurrent statements in
   // asynchronous mode that the driver can support on a given connection. If
   // there is no specific limit or the limit is unknown, this value is zero.
-  intParams[SQL_MAX_ASYNC_CONCURRENT_STATEMENTS] = 0;  // I.e., unknown
+  intParams[SQL_MAX_ASYNC_CONCURRENT_STATEMENTS] = 1;  // I.e., unknown
 #endif  // SQL_MAX_ASYNC_CONCURRENT_STATEMENTS
 
 #ifdef SQL_MAX_BINARY_LITERAL_LEN
@@ -2635,7 +2616,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // columns: SQL_CB_NULL = Result is NULL valued. SQL_CB_NON_NULL = Result is
   // concatenation of non - NULL valued column or columns. An SQL - 92 Entry
   // level-conformant driver will always return SQL_CB_NULL.
-  // TODO: GetInfo investigate - behaviour is likely SQL_CB_NON_NULL
   shortParams[SQL_CONCAT_NULL_BEHAVIOR] = SQL_CB_NON_NULL;
 #endif  // SQL_CONCAT_NULL_BEHAVIOR
 
@@ -2706,7 +2686,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // level-conformant driver will always return the SQL_GB_COLLATE option as
   // supported. If none of the options is supported, the GROUP BY clause is not
   // supported by the data source.
-  // TODO: GetInfo investigate SQL_GB_NO_RELATION
   shortParams[SQL_GROUP_BY] = SQL_GB_GROUP_BY_CONTAINS_SELECT;
 #endif  // SQL_GROUP_BY
 
@@ -2729,7 +2708,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Because identifiers in SQL-92 are never case-sensitive, a driver that
   // conforms strictly to SQL-92 (any level) will never return the
   // SQL_IC_SENSITIVE option as supported.
-  // TODO: GetInfo investigate SQL_IC_MIXED
   shortParams[SQL_IDENTIFIER_CASE] = SQL_IC_SENSITIVE;
 #endif  // SQL_IDENTIFIER_CASE
 
