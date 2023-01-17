@@ -162,7 +162,10 @@ jobs:
         cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
 
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x86-windows openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
+      shell: pwsh
+      run: |
+        . ./scripts/functions_win.ps1
+        Install-VcpkgPackages  -Triplet x86-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
 
@@ -344,7 +347,10 @@ jobs:
         cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
         
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      shell: pwsh
+      run: |
+        . ./scripts/functions_win.ps1
+        Install-VcpkgPackages  -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
 
@@ -502,7 +508,10 @@ jobs:
         cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
   
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      shell: pwsh
+      run: |
+        . ./scripts/functions_win.ps1
+        Install-VcpkgPackages  -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
 
@@ -542,10 +551,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-windows64_coverage
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.pull_request.head.ref }}
-        fetch-depth: 0
+        ref: ''
 
     - name: Retrieve coverage
       uses: actions/download-artifact@v2
@@ -576,18 +584,15 @@ jobs:
         COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Windows%20Code%20Coverage'}"
         curl $COVERAGE_BADGE > .github/badges/coverage_badge_windows.svg
 
-    - name: Update Repository Before Commit Badge
-      run: |
-        git pull
-
     - name: Commit Coverage Badge
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_options: '--allow-empty --no-verify'
         commit_message: Commit Code Coverage Badge
         file_pattern: '*.svg'
-        skip_fetch: true
-        skip_dirty_check: true
+        skip_fetch: false
+        skip_checkout: false
+        skip_dirty_check: false
 
     - name: Add Header for Code Coverage Summary Report
       run: |
