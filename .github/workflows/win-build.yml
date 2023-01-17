@@ -167,7 +167,7 @@ jobs:
       shell: pwsh
       run: |
         . ./scripts/functions_win.ps1
-        Install-VcpkgPackages  -Triplet x86-windows
+        Install-VcpkgPackages -Triplet x86-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
 
