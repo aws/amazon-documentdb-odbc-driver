@@ -194,7 +194,8 @@ jobs:
     - name: Sign Executables
       run: |
         
-        if (${{ github.event.inputs.sign && github.event.inputs.sign != 'false'}})
+        echo "Sign is set to ${github.event.inputs.sign}"
+        if (${github.event.inputs.sign && github.event.inputs.sign != 'false'})
         then
           echo "Signing is enabled. Will attempt to sign"
         
@@ -429,7 +430,8 @@ jobs:
     - name: Sign Executables
       run: |
         
-        if (${{ github.event.inputs.sign && github.event.inputs.sign != 'false'}})
+        echo "Sign is set to ${github.event.inputs.sign}"
+        if (${github.event.inputs.sign && github.event.inputs.sign != 'false'})
         then
           echo "Signing is enabled. Will attempt to sign"
         
