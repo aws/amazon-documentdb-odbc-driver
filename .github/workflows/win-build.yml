@@ -18,6 +18,7 @@ on:
         default: false
 
 env:
+  SIGNING_ENABLED: ${{ github.event.inputs.sign }}
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
   ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin/Release"
@@ -194,8 +195,8 @@ jobs:
     - name: Sign Executables
       run: |
         
-        echo "Sign is set to ${github.event.inputs.sign}"
-        if (${github.event.inputs.sign && github.event.inputs.sign != 'false'})
+        echo "Sign is set to ${SIGNING_ENABLED}"
+        if ($SIGNING_ENABLED && $SIGNING_ENABLED != 'false')
         then
           echo "Signing is enabled. Will attempt to sign"
         
@@ -430,8 +431,8 @@ jobs:
     - name: Sign Executables
       run: |
         
-        echo "Sign is set to ${github.event.inputs.sign}"
-        if (${github.event.inputs.sign && github.event.inputs.sign != 'false'})
+        echo "Sign is set to ${SIGNING_ENABLED}"
+        if ($SIGNING_ENABLED && $SIGNING_ENABLED != 'false')
         then
           echo "Signing is enabled. Will attempt to sign"
         
