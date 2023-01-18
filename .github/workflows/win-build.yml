@@ -196,7 +196,7 @@ jobs:
       run: |
         
         echo "Sign is set to ${SIGNING_ENABLED}"
-        if ($SIGNING_ENABLED && $SIGNING_ENABLED != 'false')
+        if [[ $SIGNING_ENABLED = "true" ]]
         then
           echo "Signing is enabled. Will attempt to sign"
         
@@ -233,6 +233,7 @@ jobs:
         else
           echo "Signing will be skipped"
         fi
+      shell: bash
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}} 
@@ -432,7 +433,7 @@ jobs:
       run: |
         
         echo "Sign is set to ${SIGNING_ENABLED}"
-        if ($SIGNING_ENABLED && $SIGNING_ENABLED != 'false')
+        if [[ $SIGNING_ENABLED = "true" ]]
         then
           echo "Signing is enabled. Will attempt to sign"
         
@@ -469,6 +470,7 @@ jobs:
         else
           echo "Signing will be skipped"
         fi
+      shell: bash
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
