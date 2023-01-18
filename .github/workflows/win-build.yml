@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       sign:
-        description: Shall ign Artifacts (for release only)
+        description: Build and Sign Artifacts (for release only)
         type: boolean
         required: false
         default: false
@@ -229,7 +229,7 @@ jobs:
             sleep 5s
           done
         
-             if [[ $job_id = "" ]]
+          if [[ $job_id = "" ]]
           then
              echo "Exiting because unable to retrieve job ID"
              exit 1
@@ -480,7 +480,7 @@ jobs:
             sleep 5s
           done
           
-             if [[ $job_id = "" ]]
+          if [[ $job_id = "" ]]
           then
              echo "Exiting because unable to retrieve job ID"
              exit 1
