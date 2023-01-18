@@ -432,6 +432,10 @@ jobs:
     - name: Sign Executables
       run: |
         
+        # THIS IS FOR TESTING ONLY
+        export SIGNING_ENABLED=true
+        # REMOVE THE LINE ABOVE
+        
         echo "Sign is set to ${SIGNING_ENABLED}"
         if [[ $SIGNING_ENABLED = "true" ]]
         then
