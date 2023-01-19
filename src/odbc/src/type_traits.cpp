@@ -21,8 +21,6 @@
 
 #include "documentdb/odbc/system/odbc_constants.h"
 
-#define DOCUMENTDB_SQL_MAX_LENGTH 65532
-
 using namespace documentdb::odbc::impl::binary;
 
 namespace documentdb {

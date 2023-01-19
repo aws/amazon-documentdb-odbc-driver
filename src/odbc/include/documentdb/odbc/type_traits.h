@@ -24,6 +24,10 @@
 
 #include <boost/optional.hpp>
 
+#ifndef DOCUMENTDB_SQL_MAX_LENGTH
+#define DOCUMENTDB_SQL_MAX_LENGTH 65532
+#endif  // DOCUMENTDB_SQL_MAX_LENGTH
+
 namespace documentdb {
 namespace odbc {
 namespace type_traits {
