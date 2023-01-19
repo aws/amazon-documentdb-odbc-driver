@@ -21,6 +21,8 @@
 
 #include "documentdb/odbc/system/odbc_constants.h"
 
+#define DOCUMENTDB_SQL_MAX_LENGTH 65532
+
 using namespace documentdb::odbc::impl::binary;
 
 namespace documentdb {
@@ -45,6 +47,12 @@ const std::string SqlTypeName::BIT("BIT");
 const std::string SqlTypeName::TINYINT("TINYINT");
 
 const std::string SqlTypeName::BIGINT("BIGINT");
+
+const std::string SqlTypeName::CHAR("CHAR");
+
+const std::string SqlTypeName::VARCHAR("VARCHAR");
+
+const std::string SqlTypeName::LONGVARCHAR("LONGVARCHAR");
 
 const std::string SqlTypeName::NCHAR("NCHAR");
 
@@ -158,14 +166,20 @@ const boost::optional< std::string > BinaryTypeToSqlTypeName(
       return SqlTypeName::DECIMAL;
 
     case JDBC_TYPE_CHAR:
+      return SqlTypeName::CHAR;
+
     case JDBC_TYPE_NCHAR:
       return SqlTypeName::NCHAR;
 
     case JDBC_TYPE_VARCHAR:
+      return SqlTypeName::VARCHAR;
+
     case JDBC_TYPE_NVARCHAR:
       return SqlTypeName::NVARCHAR;
 
     case JDBC_TYPE_LONGVARCHAR:
+      return SqlTypeName::LONGVARCHAR;
+
     case JDBC_TYPE_LONGNVARCHAR:
       return SqlTypeName::LONGNVARCHAR;
 
@@ -449,14 +463,20 @@ boost::optional< int16_t > BinaryToSqlType(
       return SQL_DECIMAL;
 
     case JDBC_TYPE_CHAR:
+      return SQL_CHAR;
+
     case JDBC_TYPE_NCHAR:
       return SQL_WCHAR;
 
     case JDBC_TYPE_VARCHAR:
+      return SQL_VARCHAR;
+
     case JDBC_TYPE_NVARCHAR:
       return SQL_WVARCHAR;
 
     case JDBC_TYPE_LONGVARCHAR:
+      return SQL_LONGVARCHAR;
+
     case JDBC_TYPE_LONGNVARCHAR:
       return SQL_WLONGVARCHAR;
 
@@ -528,7 +548,7 @@ boost::optional< int32_t > SqlTypeDisplaySize(boost::optional< int16_t > type) {
     case SQL_VARBINARY:
     case SQL_DECIMAL:
     case SQL_NUMERIC:
-      return SQL_NO_TOTAL;
+      return DOCUMENTDB_SQL_MAX_LENGTH;
 
     case SQL_BIT:
     case SQL_TYPE_NULL:
@@ -566,7 +586,7 @@ boost::optional< int32_t > SqlTypeDisplaySize(boost::optional< int16_t > type) {
       return 36;
 
     default:
-      return SQL_NO_TOTAL;
+      return 0;
   }
 }
 
@@ -592,7 +612,7 @@ boost::optional< int32_t > SqlTypeColumnSize(boost::optional< int16_t > type) {
     case SQL_VARBINARY:
     case SQL_DECIMAL:
     case SQL_NUMERIC:
-      return SQL_NO_TOTAL;
+      return DOCUMENTDB_SQL_MAX_LENGTH;
 
     case SQL_BIT:
     case SQL_TYPE_NULL:
@@ -630,7 +650,7 @@ boost::optional< int32_t > SqlTypeColumnSize(boost::optional< int16_t > type) {
       return 36;
 
     default:
-      return SQL_NO_TOTAL;
+      return 0;
   }
 }
 
@@ -657,7 +677,7 @@ boost::optional< int32_t > SqlTypeTransferLength(
     case SQL_VARBINARY:
     case SQL_DECIMAL:
     case SQL_NUMERIC:
-      return SQL_NO_TOTAL;
+      return DOCUMENTDB_SQL_MAX_LENGTH;
 
     case SQL_BIT:
     case SQL_TINYINT:
@@ -691,7 +711,7 @@ boost::optional< int32_t > SqlTypeTransferLength(
       return 16;
 
     default:
-      return SQL_NO_TOTAL;
+      return 0;
   }
 }
 
@@ -765,12 +785,13 @@ boost::optional< int32_t > SqlTypeCharOctetLength(
     case SQL_CHAR:
     case SQL_VARCHAR:
     case SQL_LONGVARCHAR:
+    case SQL_BINARY:
+    case SQL_LONGVARBINARY:
+      return DOCUMENTDB_SQL_MAX_LENGTH;
     case SQL_WCHAR:
     case SQL_WVARCHAR:
     case SQL_WLONGVARCHAR:
-    case SQL_BINARY:
-    case SQL_LONGVARBINARY:
-      return SQL_NO_TOTAL;
+      return sizeof(SQLWCHAR) * DOCUMENTDB_SQL_MAX_LENGTH;
 
     default:
       return 0;

@@ -101,36 +101,6 @@ AmazonDocumentDBImpl = (dsn as text) as table =>
         // For details of the format of the types table parameter and expected return value,
         // please see: https://docs.microsoft.com/en-us/sql/odbc/reference/syntax/sqlgettypeinfo-function
         //
-        // The sample implementation provided here will simply output the original table
-        // to the user trace log, without any modification. 
-        SQLGetTypeInfo = (types) => 
-            let 
-                original =
-                    if (EnableTraceOutput <> true) then
-                        types 
-                    else
-                        let 
-                            // Outputting the entire table might be too large, and result in the value being truncated.
-                            // We can output a row at a time instead with Table.TransformRows()
-                            rows = Table.TransformRows(types, each Diagnostics.LogValue("SQLGetTypeInfo " & _[TYPE_NAME], _)),
-                            toTable = Table.FromRecords(rows)
-                        in
-                            toTable,
-                modified = 
-                    if (Table.SelectRows(original, each [TYPE_NAME] = "NVARCHAR") <> null) then 
-                        let
-                            // Fix NVARCHAR data type definition: the result  forces Mashup Engine to transform any NVARCHAR
-                            // to LONGVARCHAR/VARCHAR/CHAR. Since the driver does not have definition to these types
-                            // this will eliminate the necessity of the transformation
-                            typesNVARCHARRemoved = Table.SelectRows(types, each not Text.Contains(_[TYPE_NAME], "NVARCHAR")),
-                            nvarcharRecord = original{[TYPE_NAME="NVARCHAR"]} & [COLUMN_SIZE = 65532 ],
-                            finalTable = typesNVARCHARRemoved & Table.FromRecords({nvarcharRecord})
-                        in
-                            finalTable
-                    else
-                        original
-            in
-                Value.ReplaceType(modified, Value.Type(types)),        
 
         //
         // Call to Odbc.DataSource
@@ -154,8 +124,7 @@ AmazonDocumentDBImpl = (dsn as text) as table =>
             AstVisitor = MyAstVisitor,
             SqlCapabilities = MySqlCapabilities,
             SQLGetInfo = MySQLGetInfo,
-            SQLGetFunctions = MySQLGetFunctions,
-            SQLGetTypeInfo = SQLGetTypeInfo
+            SQLGetFunctions = MySQLGetFunctions
         ])
         
     in OdbcDatasource;
