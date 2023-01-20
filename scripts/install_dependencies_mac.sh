@@ -50,6 +50,7 @@ else
         if [[ "${apps_installed[i]}" -eq "0" ]]; then
             echo  "${req_apps[i]} is not installed, attempt to install it with brew."
             brew install ${req_apps[i]}
+            # The libiodbc package may conflict with the unixodbc package
             if [[ "${req_apps[i]}" -eq "libiodbc" ]]; then
                 brew link --overwrite --force ${req_apps[i]}
             fi
