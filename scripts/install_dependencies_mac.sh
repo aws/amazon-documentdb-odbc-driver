@@ -26,8 +26,8 @@ brew tap homebrew/services
 
 # unlink unix ODBC driver manager
 if brew ls --versions unixodbc > /dev/null; then
-    echo "unixodbc is installed via brew. unlink unixodbc"
-    brew unlink unixodbc
+    echo "unixodbc is installed via brew. remove unixodbc"
+    brew remove unixodbc
 fi
 # check if dependnecies are installed
 
