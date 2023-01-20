@@ -362,16 +362,16 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     BOOST_CHECK_EQUAL(columnCount, 9);
 
     CheckColumnMetaWithSQLDescribeCol(stmt, 1, "meta_queries_test_001__id",
-                                      SQL_WVARCHAR, SQL_NO_TOTAL, -1,
+                                      SQL_VARCHAR, DOCUMENTDB_SQL_MAX_LENGTH, -1,
                                       SQL_NO_NULLS);
     CheckColumnMetaWithSQLDescribeCol(stmt, 2, "fieldDecimal128", SQL_DECIMAL,
-                                      SQL_NO_TOTAL, -1, SQL_NULLABLE);
+                                      DOCUMENTDB_SQL_MAX_LENGTH, -1, SQL_NULLABLE);
     CheckColumnMetaWithSQLDescribeCol(stmt, 3, "fieldDouble", SQL_DOUBLE, 15,
                                       -1, SQL_NULLABLE);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 4, "fieldString", SQL_WVARCHAR,
-                                      SQL_NO_TOTAL, -1, SQL_NULLABLE);
-    CheckColumnMetaWithSQLDescribeCol(stmt, 5, "fieldObjectId", SQL_WVARCHAR,
-                                      SQL_NO_TOTAL, -1, SQL_NULLABLE);
+    CheckColumnMetaWithSQLDescribeCol(stmt, 4, "fieldString", SQL_VARCHAR,
+                                      DOCUMENTDB_SQL_MAX_LENGTH, -1, SQL_NULLABLE);
+    CheckColumnMetaWithSQLDescribeCol(stmt, 5, "fieldObjectId", SQL_VARCHAR,
+                                      DOCUMENTDB_SQL_MAX_LENGTH, -1, SQL_NULLABLE);
     CheckColumnMetaWithSQLDescribeCol(stmt, 6, "fieldBoolean", SQL_BIT, 1, -1,
                                       SQL_NULLABLE);
     CheckColumnMetaWithSQLDescribeCol(stmt, 7, "fieldDate", SQL_TYPE_TIMESTAMP,
@@ -379,7 +379,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     CheckColumnMetaWithSQLDescribeCol(stmt, 8, "fieldInt", SQL_INTEGER, 10, 0,
                                       SQL_NULLABLE);
     CheckColumnMetaWithSQLDescribeCol(stmt, 9, "fieldBinary", SQL_VARBINARY,
-                                      SQL_NO_TOTAL, -1, SQL_NULLABLE);
+                                      DOCUMENTDB_SQL_MAX_LENGTH, -1, SQL_NULLABLE);
   }
 
   /**
@@ -462,16 +462,16 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     BOOST_CHECK_EQUAL(columnCount, 9);
 
     CheckColumnMetaWithSQLColAttribute(stmt, 1, "meta_queries_test_001__id",
-                                       SQL_WVARCHAR, SQL_NO_TOTAL, -1,
+                                       SQL_VARCHAR, DOCUMENTDB_SQL_MAX_LENGTH, -1,
                                        SQL_NO_NULLS);
     CheckColumnMetaWithSQLColAttribute(stmt, 2, "fieldDecimal128", SQL_DECIMAL,
-                                       SQL_NO_TOTAL, -1, SQL_NULLABLE);
+                                       DOCUMENTDB_SQL_MAX_LENGTH, -1, SQL_NULLABLE);
     CheckColumnMetaWithSQLColAttribute(stmt, 3, "fieldDouble", SQL_DOUBLE, 15,
                                        -1, SQL_NULLABLE);
-    CheckColumnMetaWithSQLColAttribute(stmt, 4, "fieldString", SQL_WVARCHAR,
-                                       SQL_NO_TOTAL, -1, SQL_NULLABLE);
-    CheckColumnMetaWithSQLColAttribute(stmt, 5, "fieldObjectId", SQL_WVARCHAR,
-                                       SQL_NO_TOTAL, -1, SQL_NULLABLE);
+    CheckColumnMetaWithSQLColAttribute(stmt, 4, "fieldString", SQL_VARCHAR,
+                                       DOCUMENTDB_SQL_MAX_LENGTH, -1, SQL_NULLABLE);
+    CheckColumnMetaWithSQLColAttribute(stmt, 5, "fieldObjectId", SQL_VARCHAR,
+                                       DOCUMENTDB_SQL_MAX_LENGTH, -1, SQL_NULLABLE);
     CheckColumnMetaWithSQLColAttribute(stmt, 6, "fieldBoolean", SQL_BIT, 1, -1,
                                        SQL_NULLABLE);
     CheckColumnMetaWithSQLColAttribute(stmt, 7, "fieldDate", SQL_TYPE_TIMESTAMP,
@@ -479,7 +479,7 @@ struct MetaQueriesTestSuiteFixture : public odbc::OdbcTestSuite {
     CheckColumnMetaWithSQLColAttribute(stmt, 8, "fieldInt", SQL_INTEGER, 10, 0,
                                        SQL_NULLABLE);
     CheckColumnMetaWithSQLColAttribute(stmt, 9, "fieldBinary", SQL_VARBINARY,
-                                       SQL_NO_TOTAL, -1, SQL_NULLABLE);
+                                       DOCUMENTDB_SQL_MAX_LENGTH, -1, SQL_NULLABLE);
   }
 
   /**
@@ -614,19 +614,19 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDataTypesAndColumnNames) {
   connectToLocalServer(databaseName);
 
   std::pair< int16_t, std::string > tests[] = {
-      std::make_pair(SQL_WVARCHAR, std::string("meta_queries_test_002__id")),
+      std::make_pair(SQL_VARCHAR, std::string("meta_queries_test_002__id")),
       std::make_pair(SQL_DECIMAL, std::string("fieldDecimal128")),
       std::make_pair(SQL_DOUBLE, std::string("fieldFloat")),
       // our ODBC driver identifies float fields as double by default
       std::make_pair(SQL_DOUBLE, std::string("fieldDouble")),
-      std::make_pair(SQL_WVARCHAR, std::string("fieldString")),
-      std::make_pair(SQL_WVARCHAR, std::string("fieldObjectId")),
+      std::make_pair(SQL_VARCHAR, std::string("fieldString")),
+      std::make_pair(SQL_VARCHAR, std::string("fieldObjectId")),
       std::make_pair(SQL_BIT, std::string("fieldBoolean")),
       std::make_pair(SQL_TYPE_TIMESTAMP, std::string("fieldDate")),
       std::make_pair(SQL_INTEGER, std::string("fieldInt")),
       std::make_pair(SQL_DOUBLE, std::string("fieldLong")),
-      std::make_pair(SQL_WVARCHAR, std::string("fieldMaxKey")),
-      std::make_pair(SQL_WVARCHAR, std::string("fieldMinKey")),
+      std::make_pair(SQL_VARCHAR, std::string("fieldMaxKey")),
+      std::make_pair(SQL_VARCHAR, std::string("fieldMinKey")),
       std::make_pair(SQL_TYPE_NULL, std::string("fieldNull")),
       std::make_pair(SQL_VARBINARY, std::string("fieldBinary"))};
 
@@ -724,7 +724,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
-  callSQLColAttribute(stmt, req1, SQL_DESC_CONCISE_TYPE, SQL_WVARCHAR);
+  callSQLColAttribute(stmt, req1, SQL_DESC_CONCISE_TYPE, SQL_VARCHAR);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
@@ -757,8 +757,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescDisplaySize) {
 
   const SQLCHAR req1[] = "select fieldBinary from meta_queries_test_001";
 
-  // SQL_VARBINARY should have display size SQL_NO_TOTAL
-  callSQLColAttribute(stmt, req1, SQL_DESC_DISPLAY_SIZE, SQL_NO_TOTAL);
+  // SQL_VARBINARY should have display size DOCUMENTDB_SQL_MAX_LENGTH
+  callSQLColAttribute(stmt, req1, SQL_DESC_DISPLAY_SIZE, DOCUMENTDB_SQL_MAX_LENGTH);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
@@ -806,8 +806,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_WVARCHAR should have length SQL_NO_TOTAL
-  callSQLColAttribute(stmt, req1, SQL_DESC_LENGTH, SQL_NO_TOTAL);
+  // SQL_VARCHAR should have length DOCUMENTDB_SQL_MAX_LENGTH
+  callSQLColAttribute(stmt, req1, SQL_DESC_LENGTH, DOCUMENTDB_SQL_MAX_LENGTH);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
 
@@ -879,9 +879,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
 
   const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_WVARCHAR should have type name SqlTypeName::NVARCHAR
+  // SQL_VARCHAR should have type name SqlTypeName::NVARCHAR
   callSQLColAttribute(stmt, req2, SQL_DESC_LOCAL_TYPE_NAME,
-                      SqlTypeName::NVARCHAR);
+                      SqlTypeName::VARCHAR);
 
   const SQLCHAR req3[] = "select fieldBinary from meta_queries_test_002";
 
@@ -943,7 +943,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
 
   const SQLCHAR req3[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_WVARCHAR (non-numeric type) should have precision radix 0
+  // SQL_VARCHAR (non-numeric type) should have precision radix 0
   callSQLColAttribute(stmt, req3, SQL_DESC_NUM_PREC_RADIX, 0);
 }
 
@@ -955,8 +955,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescOctetLength) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_WVARCHAR should have octet length SQL_NO_TOTAL
-  callSQLColAttribute(stmt, req1, SQL_DESC_OCTET_LENGTH, SQL_NO_TOTAL);
+  // SQL_VARCHAR should have octet length DOCUMENTDB_SQL_MAX_LENGTH
+  callSQLColAttribute(stmt, req1, SQL_DESC_OCTET_LENGTH, DOCUMENTDB_SQL_MAX_LENGTH);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
 
@@ -985,8 +985,8 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescPrecision) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
-  // SQL_WVARCHAR should have precision SQL_NO_TOTAL
-  callSQLColAttribute(stmt, req1, SQL_DESC_PRECISION, SQL_NO_TOTAL);
+  // SQL_VARCHAR should have precision DOCUMENTDB_SQL_MAX_LENGTH
+  callSQLColAttribute(stmt, req1, SQL_DESC_PRECISION, DOCUMENTDB_SQL_MAX_LENGTH);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
@@ -1058,7 +1058,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_001";
 
-  callSQLColAttribute(stmt, req1, SQL_DESC_TYPE, SQL_WVARCHAR);
+  callSQLColAttribute(stmt, req1, SQL_DESC_TYPE, SQL_VARCHAR);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_001";
 
@@ -1221,7 +1221,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributesColumnScalePrepare) {
 BOOST_AUTO_TEST_CASE(TestGetTypeInfoSingle) {
   connectToLocalServer("odbc-test");
 
-  SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_WVARCHAR);
+  SQLRETURN ret = SQLGetTypeInfo(stmt, SQL_VARCHAR);
 
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
@@ -1238,17 +1238,19 @@ BOOST_AUTO_TEST_CASE(TestGetTypeInfoAll) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   std::set< std::string > typeNames = {
-      "BIGINT",   "BINARY",  "BIT",       "DATE",    "DECIMAL",  "DOUBLE",
-      "FLOAT",    "INTEGER", "NCHAR",     "NULL",    "NVARCHAR", "REAL",
-      "SMALLINT", "TIME",    "TIMESTAMP", "TINYINT", "VARBINARY"};
+      "BIGINT",    "BINARY",   "BIT",       "CHAR",     "DATE",
+      "DECIMAL",   "DOUBLE",   "FLOAT",     "INTEGER",  "NCHAR",
+      "NULL",      "NVARCHAR", "REAL",      "SMALLINT", "TIME",
+      "TIMESTAMP", "TINYINT",  "VARBINARY", "VARCHAR"};
   std::set< int16_t > dataTypes = {
       SQL_BIGINT,    SQL_BINARY,         SQL_BIT,       SQL_DECIMAL,
       SQL_DOUBLE,    SQL_FLOAT,          SQL_INTEGER,   SQL_REAL,
       SQL_SMALLINT,  SQL_TINYINT,        SQL_TYPE_DATE, SQL_TYPE_NULL,
-      SQL_TYPE_TIME, SQL_TYPE_TIMESTAMP, SQL_VARBINARY, SQL_WCHAR,
-      SQL_WVARCHAR};
-  std::set< int16_t > caseSensitiveDataTypes = {SQL_CHAR, SQL_VARCHAR,
-                                                SQL_WCHAR, SQL_WVARCHAR};
+      SQL_TYPE_TIME, SQL_TYPE_TIMESTAMP, SQL_VARBINARY, SQL_CHAR,
+      SQL_VARCHAR,   SQL_WCHAR,          SQL_WVARCHAR};
+  std::set< int16_t > caseSensitiveDataTypes = {
+      SQL_CHAR,     SQL_VARCHAR,      SQL_WCHAR,
+      SQL_WVARCHAR, SQL_WLONGVARCHAR, SQL_LONGVARCHAR};
   std::set< int16_t > signedDataTypes = {
       SQL_BIT,  SQL_TINYINT, SQL_SMALLINT, SQL_INTEGER, SQL_BIGINT,
       SQL_REAL, SQL_FLOAT,   SQL_DOUBLE,   SQL_DECIMAL, SQL_NUMERIC};
@@ -1397,8 +1399,8 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
 
   using namespace documentdb::odbc::type_traits;
   BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);                   // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);           // TYPE_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);                   // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);           // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
@@ -1421,16 +1423,16 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldString", column_name);       // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);          // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);          // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldObjectId", column_name);     // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);          // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);          // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
@@ -1469,16 +1471,16 @@ BOOST_AUTO_TEST_CASE(TestDataTypes) {
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldMaxKey", column_name);       // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);          // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);          // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
     BOOST_FAIL(GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 
   BOOST_CHECK_EQUAL("fieldMinKey", column_name);       // COLUMN_NAME
-  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);          // DATA_TYPE
-  BOOST_CHECK_EQUAL(SqlTypeName::NVARCHAR, type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);          // DATA_TYPE
+  BOOST_CHECK_EQUAL(SqlTypeName::VARCHAR, type_name);  // TYPE_NAME
 
   ret = SQLFetch(stmt);
   if (!SQL_SUCCEEDED(ret))
@@ -1965,13 +1967,13 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(false, WasNull(column_name_len));
   BOOST_CHECK_EQUAL("meta_queries_test_001__id", column_name);  // COLUMN_NAME
   BOOST_CHECK_EQUAL(false, WasNull(data_type_len));
-  BOOST_CHECK_EQUAL(SQL_WVARCHAR, data_type);  // DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, data_type);  // DATA_TYPE
   BOOST_CHECK_EQUAL(false, WasNull(type_name_len));
-  BOOST_CHECK_EQUAL("NVARCHAR", type_name);  // TYPE_NAME
+  BOOST_CHECK_EQUAL("VARCHAR", type_name);  // TYPE_NAME
   BOOST_CHECK_EQUAL(false, WasNull(column_size_len));
-  BOOST_CHECK_EQUAL(SQL_NO_TOTAL, column_size);  // COLUMN_SIZE
+  BOOST_CHECK_EQUAL(DOCUMENTDB_SQL_MAX_LENGTH, column_size);  // COLUMN_SIZE
   BOOST_CHECK_EQUAL(false, WasNull(buffer_length_len));
-  BOOST_CHECK_EQUAL(SQL_NO_TOTAL, buffer_length);  // BUFFER_LENGTH
+  BOOST_CHECK_EQUAL(DOCUMENTDB_SQL_MAX_LENGTH, buffer_length);  // BUFFER_LENGTH
   BOOST_CHECK_EQUAL(true, WasNull(decimal_digits_len));
   BOOST_CHECK_EQUAL(0, decimal_digits);  // DECIMAL_DIGITS
   BOOST_CHECK_EQUAL(false, WasNull(num_prec_radix_len));
@@ -1983,11 +1985,11 @@ BOOST_AUTO_TEST_CASE(TestSQLColumnWithSQLBindCols) {
   BOOST_CHECK_EQUAL(true, WasNull(column_def_len));
   BOOST_CHECK_EQUAL("", column_def);  // COLUMN_DEF
   BOOST_CHECK_EQUAL(false, WasNull(sql_data_type_len));
-  BOOST_CHECK_EQUAL(SQL_WVARCHAR, sql_data_type);  // SQL_DATA_TYPE
+  BOOST_CHECK_EQUAL(SQL_VARCHAR, sql_data_type);  // SQL_DATA_TYPE
   BOOST_CHECK_EQUAL(true, WasNull(sql_datetime_sub_len));
   BOOST_CHECK_EQUAL(0, sql_datetime_sub);  // SQL_DATETIME_SUB
   BOOST_CHECK_EQUAL(false, WasNull(char_octet_length_len));
-  BOOST_CHECK_EQUAL(SQL_NO_TOTAL, char_octet_length);  // CHAR_OCTET_LENGTH
+  BOOST_CHECK_EQUAL(DOCUMENTDB_SQL_MAX_LENGTH, char_octet_length);  // CHAR_OCTET_LENGTH
   BOOST_CHECK_EQUAL(false, WasNull(ordinal_position_len));
   BOOST_CHECK_EQUAL(1, ordinal_position);  // ORDINAL_POSITION
   BOOST_CHECK_EQUAL(false, WasNull(is_nullable_len));

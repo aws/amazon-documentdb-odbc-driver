@@ -100,12 +100,12 @@ BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   // test SQL_DESC_TYPE_NAME
   found = columnMeta.GetAttribute(SQL_DESC_TYPE_NAME, resVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(resVal, SqlTypeName::NVARCHAR);
+  BOOST_CHECK_EQUAL(resVal, SqlTypeName::VARCHAR);
 
   // test SQL_DESC_LOCAL_TYPE_NAME
   found = columnMeta.GetAttribute(SQL_DESC_LOCAL_TYPE_NAME, resVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(resVal, SqlTypeName::NVARCHAR);
+  BOOST_CHECK_EQUAL(resVal, SqlTypeName::VARCHAR);
 
   // fields SQL_COLUMN_PRECISION and SQL_DESC_SCALE are not tested
   // for retrieving string values
@@ -130,27 +130,27 @@ BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   // test SQL_DESC_CONCISE_TYPE
   found = columnMeta.GetAttribute(SQL_DESC_CONCISE_TYPE, intVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(intVal, SQL_WVARCHAR);
+  BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
 
   // test SQL_DESC_TYPE
   found = columnMeta.GetAttribute(SQL_DESC_TYPE, intVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(intVal, SQL_WVARCHAR);
+  BOOST_CHECK_EQUAL(intVal, SQL_VARCHAR);
 
   // test SQL_DESC_DISPLAY_SIZE
   found = columnMeta.GetAttribute(SQL_DESC_DISPLAY_SIZE, intVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+  BOOST_CHECK_EQUAL(intVal, DOCUMENTDB_SQL_MAX_LENGTH);
 
   // test SQL_DESC_LENGTH
   found = columnMeta.GetAttribute(SQL_DESC_LENGTH, intVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+  BOOST_CHECK_EQUAL(intVal, DOCUMENTDB_SQL_MAX_LENGTH);
 
   // test SQL_DESC_OCTET_LENGTH
   found = columnMeta.GetAttribute(SQL_DESC_OCTET_LENGTH, intVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+  BOOST_CHECK_EQUAL(intVal, DOCUMENTDB_SQL_MAX_LENGTH);
 
   // test SQL_DESC_NULLABLE
   found = columnMeta.GetAttribute(SQL_DESC_NULLABLE, intVal);
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(TestGetAttribute) {
   // test SQL_DESC_PRECISION
   found = columnMeta.GetAttribute(SQL_DESC_PRECISION, intVal);
   BOOST_CHECK(found);
-  BOOST_CHECK_EQUAL(intVal, SQL_NO_TOTAL);
+  BOOST_CHECK_EQUAL(intVal, DOCUMENTDB_SQL_MAX_LENGTH);
 
   // test SQL_DESC_SCALE
   found = columnMeta.GetAttribute(SQL_DESC_SCALE, intVal);
@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeLocalTypeName) {
       std::make_pair(JDBC_TYPE_FLOAT, SqlTypeName::FLOAT),
       std::make_pair(JDBC_TYPE_REAL, SqlTypeName::REAL),
       std::make_pair(JDBC_TYPE_DOUBLE, SqlTypeName::DOUBLE),
-      std::make_pair(JDBC_TYPE_VARCHAR, SqlTypeName::NVARCHAR),
+      std::make_pair(JDBC_TYPE_VARCHAR, SqlTypeName::VARCHAR),
       std::make_pair(JDBC_TYPE_BINARY, SqlTypeName::BINARY),
       std::make_pair(JDBC_TYPE_VARBINARY, SqlTypeName::VARBINARY),
       std::make_pair(JDBC_TYPE_DATE, SqlTypeName::DATE),
@@ -362,9 +362,9 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeConciseTypeAndType) {
   bool found;
 
   std::pair< int16_t, SQLLEN > tests[] = {
-      std::make_pair(JDBC_TYPE_VARCHAR, SQL_WVARCHAR),
-      std::make_pair(JDBC_TYPE_CHAR, SQL_WCHAR),
-      std::make_pair(JDBC_TYPE_LONGVARCHAR, SQL_WLONGVARCHAR),
+      std::make_pair(JDBC_TYPE_VARCHAR, SQL_VARCHAR),
+      std::make_pair(JDBC_TYPE_CHAR, SQL_CHAR),
+      std::make_pair(JDBC_TYPE_LONGVARCHAR, SQL_LONGVARCHAR),
       std::make_pair(JDBC_TYPE_BOOLEAN, SQL_BIT),
       std::make_pair(JDBC_TYPE_SMALLINT, SQL_SMALLINT),
       std::make_pair(JDBC_TYPE_TINYINT, SQL_TINYINT),
@@ -408,9 +408,9 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeDisplaySize) {
   bool found;
 
   std::pair< int16_t, SQLLEN > tests[] = {
-      std::make_pair(JDBC_TYPE_VARCHAR, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_CHAR, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_LONGVARCHAR, SQL_NO_TOTAL),
+      std::make_pair(JDBC_TYPE_VARCHAR, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_CHAR, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_LONGVARCHAR, DOCUMENTDB_SQL_MAX_LENGTH),
       std::make_pair(JDBC_TYPE_BOOLEAN, 1),
       std::make_pair(JDBC_TYPE_SMALLINT, 6),
       std::make_pair(JDBC_TYPE_TINYINT, 4),
@@ -419,8 +419,8 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeDisplaySize) {
       std::make_pair(JDBC_TYPE_FLOAT, 24),
       std::make_pair(JDBC_TYPE_REAL, 14),
       std::make_pair(JDBC_TYPE_DOUBLE, 24),
-      std::make_pair(JDBC_TYPE_BINARY, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_VARBINARY, SQL_NO_TOTAL),
+      std::make_pair(JDBC_TYPE_BINARY, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_VARBINARY, DOCUMENTDB_SQL_MAX_LENGTH),
       std::make_pair(JDBC_TYPE_DATE, 10),
       std::make_pair(JDBC_TYPE_TIME, 8),
       std::make_pair(JDBC_TYPE_TIMESTAMP, 19)};
@@ -449,9 +449,9 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeLength) {
   bool found;
 
   std::pair< int16_t, SQLLEN > tests[] = {
-      std::make_pair(JDBC_TYPE_VARCHAR, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_CHAR, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_LONGVARCHAR, SQL_NO_TOTAL),
+      std::make_pair(JDBC_TYPE_VARCHAR, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_CHAR, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_LONGVARCHAR, DOCUMENTDB_SQL_MAX_LENGTH),
       std::make_pair(JDBC_TYPE_BOOLEAN, 1),
       std::make_pair(JDBC_TYPE_SMALLINT, 2),
       std::make_pair(JDBC_TYPE_TINYINT, 1),
@@ -460,8 +460,8 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeLength) {
       std::make_pair(JDBC_TYPE_FLOAT, 4),
       std::make_pair(JDBC_TYPE_REAL, 4),
       std::make_pair(JDBC_TYPE_DOUBLE, 8),
-      std::make_pair(JDBC_TYPE_BINARY, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_VARBINARY, SQL_NO_TOTAL),
+      std::make_pair(JDBC_TYPE_BINARY, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_VARBINARY, DOCUMENTDB_SQL_MAX_LENGTH),
       std::make_pair(JDBC_TYPE_DATE, 6),
       std::make_pair(JDBC_TYPE_TIME, 6),
       std::make_pair(JDBC_TYPE_TIMESTAMP, 16)};
@@ -491,9 +491,9 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeOctetLength) {
   size_t size_of_char = sizeof(char);
 
   std::pair< int16_t, SQLLEN > tests[] = {
-      std::make_pair(JDBC_TYPE_VARCHAR, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_CHAR, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_LONGVARCHAR, SQL_NO_TOTAL),
+      std::make_pair(JDBC_TYPE_VARCHAR, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_CHAR, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_LONGVARCHAR, DOCUMENTDB_SQL_MAX_LENGTH),
       std::make_pair(JDBC_TYPE_BOOLEAN, 1 * size_of_char),
       std::make_pair(JDBC_TYPE_SMALLINT, 2 * size_of_char),
       std::make_pair(JDBC_TYPE_TINYINT, 1 * size_of_char),
@@ -502,8 +502,8 @@ BOOST_AUTO_TEST_CASE(TestGetAttributeOctetLength) {
       std::make_pair(JDBC_TYPE_FLOAT, 4 * size_of_char),
       std::make_pair(JDBC_TYPE_REAL, 4 * size_of_char),
       std::make_pair(JDBC_TYPE_DOUBLE, 8 * size_of_char),
-      std::make_pair(JDBC_TYPE_BINARY, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_VARBINARY, SQL_NO_TOTAL),
+      std::make_pair(JDBC_TYPE_BINARY, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_VARBINARY, DOCUMENTDB_SQL_MAX_LENGTH),
       std::make_pair(JDBC_TYPE_DATE, 6 * size_of_char),
       std::make_pair(JDBC_TYPE_TIME, 6 * size_of_char),
       std::make_pair(JDBC_TYPE_TIMESTAMP, 16 * size_of_char)};
@@ -603,9 +603,9 @@ BOOST_AUTO_TEST_CASE(TestGetAttributePrecision) {
   bool found;
 
   std::pair< int16_t, SQLLEN > tests[] = {
-      std::make_pair(JDBC_TYPE_VARCHAR, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_CHAR, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_LONGVARCHAR, SQL_NO_TOTAL),
+      std::make_pair(JDBC_TYPE_VARCHAR, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_CHAR, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_LONGVARCHAR, DOCUMENTDB_SQL_MAX_LENGTH),
       std::make_pair(JDBC_TYPE_BOOLEAN, 1),
       std::make_pair(JDBC_TYPE_SMALLINT, 5),
       std::make_pair(JDBC_TYPE_TINYINT, 3),
@@ -614,8 +614,8 @@ BOOST_AUTO_TEST_CASE(TestGetAttributePrecision) {
       std::make_pair(JDBC_TYPE_FLOAT, 15),
       std::make_pair(JDBC_TYPE_REAL, 7),
       std::make_pair(JDBC_TYPE_DOUBLE, 15),
-      std::make_pair(JDBC_TYPE_BINARY, SQL_NO_TOTAL),
-      std::make_pair(JDBC_TYPE_VARBINARY, SQL_NO_TOTAL),
+      std::make_pair(JDBC_TYPE_BINARY, DOCUMENTDB_SQL_MAX_LENGTH),
+      std::make_pair(JDBC_TYPE_VARBINARY, DOCUMENTDB_SQL_MAX_LENGTH),
       std::make_pair(JDBC_TYPE_DATE, 10),
       std::make_pair(JDBC_TYPE_TIME, 8),
       std::make_pair(JDBC_TYPE_TIMESTAMP, 19)};
