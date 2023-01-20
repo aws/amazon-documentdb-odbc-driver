@@ -786,6 +786,7 @@ boost::optional< int32_t > SqlTypeCharOctetLength(
     case SQL_BINARY:
     case SQL_LONGVARBINARY:
       return DOCUMENTDB_SQL_MAX_LENGTH;
+
     case SQL_WCHAR:
     case SQL_WVARCHAR:
     case SQL_WLONGVARCHAR:

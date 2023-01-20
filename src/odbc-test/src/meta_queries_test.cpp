@@ -806,7 +806,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLength) {
 
   const SQLCHAR req1[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_WVARCHAR should have length DOCUMENTDB_SQL_MAX_LENGTH
+  // SQL_VARCHAR should have length DOCUMENTDB_SQL_MAX_LENGTH
   callSQLColAttribute(stmt, req1, SQL_DESC_LENGTH, DOCUMENTDB_SQL_MAX_LENGTH);
 
   const SQLCHAR req2[] = "select fieldInt from meta_queries_test_002";
@@ -879,7 +879,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescLocalTypeName) {
 
   const SQLCHAR req2[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_WVARCHAR should have type name SqlTypeName::NVARCHAR
+  // SQL_VARCHAR should have type name SqlTypeName::NVARCHAR
   callSQLColAttribute(stmt, req2, SQL_DESC_LOCAL_TYPE_NAME,
                       SqlTypeName::VARCHAR);
 
@@ -943,7 +943,7 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescNumPrecRadix) {
 
   const SQLCHAR req3[] = "select fieldString from meta_queries_test_002";
 
-  // SQL_WVARCHAR (non-numeric type) should have precision radix 0
+  // SQL_VARCHAR (non-numeric type) should have precision radix 0
   callSQLColAttribute(stmt, req3, SQL_DESC_NUM_PREC_RADIX, 0);
 }
 
