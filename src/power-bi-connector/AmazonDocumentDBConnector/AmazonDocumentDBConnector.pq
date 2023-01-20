@@ -1,16 +1,16 @@
 ﻿// This file contains your Data Connector logic
-[Version = "1.0.0"]
+[Version = "0.1.1"]
 section AmazonDocumentDB;
 
 // When set to true, additional trace information will be written out to the User log. 
 // This should be set to false before release. Tracing is done through a call to 
 // Diagnostics.LogValue(). When EnableTraceOutput is set to false, the call becomes a 
 // no-op and simply returns the original value.
-EnableTraceOutput = true;
+EnableTraceOutput = false;
 
 Config_DriverName = "Amazon DocumentDB";
 
-/* This is the method for connection to ODBC*/
+/* This is the method for connection to ODBC */
 [DataSource.Kind="AmazonDocumentDB", Publish="AmazonDocumentDB.UI"]
 
 shared AmazonDocumentDB.Contents = Value.ReplaceType(AmazonDocumentDBImpl, AmazonDocumentDBType);
@@ -50,7 +50,7 @@ AmazonDocumentDBImpl = (dsn as text) as table =>
             PWD = Credential[Password]
         ],
     
-        MySqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
+        SqlCapabilities = Diagnostics.LogValue("SqlCapabilities_Options", [
             GroupByCapabilities = ODBC[SQL_GB][SQL_GB_GROUP_BY_CONTAINS_SELECT],
             SupportsNumericLiterals = true,
             SupportsStringLiterals = true,                
@@ -63,13 +63,13 @@ AmazonDocumentDBImpl = (dsn as text) as table =>
             LimitClauseKind = LimitClauseKind.LimitOffset,
             FractionalSecondsScale = 3
         ]),
-        MySQLGetInfo = Diagnostics.LogValue("SQLGetInfo_Options", [
+        SQLGetInfo = Diagnostics.LogValue("SQLGetInfo_Options", [
             SQL_SQL92_PREDICATES = ODBC[SQL_SP][All], // (SQL_SP) all
             SQL_AGGREGATE_FUNCTIONS = 0xFF, //all
             SQL_SQL_CONFORMANCE = 0x8, // FULL
             SQL_GROUP_BY = ODBC[SQL_GB][SQL_GB_GROUP_BY_CONTAINS_SELECT]
         ]),
-        MySQLGetFunctions = Diagnostics.LogValue("SQLGetFunctions_Options", [
+        SQLGetFunctions = Diagnostics.LogValue("SQLGetFunctions_Options", [
             SQL_API_SQLBINDPARAMETER = false,
             SQL_CONVERT_FUNCTIONS = 0x2 // CAST
         ]),
@@ -79,7 +79,7 @@ AmazonDocumentDBImpl = (dsn as text) as table =>
         // operations. The most common usage is to define syntax for LIMIT/OFFSET operators 
         // when TOP is not supported. 
         // 
-        MyAstVisitor = [
+        AstVisitor = [
             LimitClause = (skip, take) =>
             let
                 offset = if (skip <> null and skip > 0) then Text.Format("OFFSET #{0} ROWS", {skip}) else "",
@@ -113,18 +113,19 @@ AmazonDocumentDBImpl = (dsn as text) as table =>
             // will be organized by Database -> Schema -> Table. When set to false,
             // all tables will be displayed in a flat list using fully qualified names. 
             HierarchicalNavigation = true,
-            //Expose Native Query
+            // Expose Native Query
             HideNativeQuery = false,
-            //Allows the M engine to select a compatible data type when conversion between two specific numeric types is not declared as supported in the SQL_CONVERT_* capabilities.
+            // Allows the M engine to select a compatible data type when conversion between two specific numeric types 
+            // is not declared as supported in the SQL_CONVERT_* capabilities.
             SoftNumbers = true,
             TolerateConcatOverflow = true,
             // These values should be set by previous steps
             CredentialConnectionString = CredentialConnectionString,
-            //Requires AstVisitor since Top is not supported in DocumentDB
-            AstVisitor = MyAstVisitor,
-            SqlCapabilities = MySqlCapabilities,
-            SQLGetInfo = MySQLGetInfo,
-            SQLGetFunctions = MySQLGetFunctions
+            // Requires AstVisitor since Top is not supported in DocumentDB
+            AstVisitor = AstVisitor,
+            SqlCapabilities = SqlCapabilities,
+            SQLGetInfo = SQLGetInfo,
+            SQLGetFunctions = SQLGetFunctions
         ])
         
     in OdbcDatasource;
