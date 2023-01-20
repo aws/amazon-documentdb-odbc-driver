@@ -1075,7 +1075,6 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
       SQL_FN_STR_CHAR_LENGTH
       | SQL_FN_STR_CONCAT
       | SQL_FN_STR_LEFT
-      //| SQL_FN_STR_LOCATE // Unsupported in JDBC driver
       | SQL_FN_STR_CHARACTER_LENGTH
       | SQL_FN_STR_POSITION
       | SQL_FN_STR_RIGHT
