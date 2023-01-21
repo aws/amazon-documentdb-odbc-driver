@@ -1254,6 +1254,10 @@ BOOST_AUTO_TEST_CASE(TestGetTypeInfoAll) {
   std::set< int16_t > signedDataTypes = {
       SQL_BIT,  SQL_TINYINT, SQL_SMALLINT, SQL_INTEGER, SQL_BIGINT,
       SQL_REAL, SQL_FLOAT,   SQL_DOUBLE,   SQL_DECIMAL, SQL_NUMERIC};
+
+  std::set< std::string > uniqueTypeNames;
+  std::set< int16_t > uniqueDataTypes;
+
   SQLWCHAR name[SQL_MAX_MESSAGE_LENGTH];
   SQLLEN name_len;
   SQLSMALLINT dataType;
@@ -1271,11 +1275,16 @@ BOOST_AUTO_TEST_CASE(TestGetTypeInfoAll) {
     BOOST_REQUIRE(SQL_SUCCEEDED(ret));
     BOOST_CHECK(typeNames.find(utility::SqlWcharToString(name))
                 != typeNames.end());
+    BOOST_CHECK(uniqueTypeNames.find(utility::SqlWcharToString(name))
+                == uniqueTypeNames.end());
+    uniqueTypeNames.insert(utility::SqlWcharToString(name));
 
     ret =
         SQLGetData(stmt, 2, SQL_C_SSHORT, &dataType, sizeof(dataType), nullptr);
     BOOST_REQUIRE(SQL_SUCCEEDED(ret));
     BOOST_CHECK(dataTypes.find(dataType) != dataTypes.end());
+    BOOST_CHECK(uniqueDataTypes.find(dataType) == uniqueDataTypes.end());
+    uniqueDataTypes.insert(dataType);
 
     ret =
         SQLGetData(stmt, 8, SQL_C_SSHORT, &isCaseSensitive, sizeof(isCaseSensitive), nullptr);

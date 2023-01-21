@@ -64,9 +64,9 @@ CTestTestfile.cmake
 /sdk-build64/
 /cmake-build32/
 /cmake-build64/
-/src/PowerBIConnector/DatabaseConnector/bin/Debug/
-/src/PowerBIConnector/DatabaseConnector/obj/
-/src/PowerBIConnector/DatabaseConnector/.vs/
+/src/power-bi-connector/AmazonDocumentDBConnector/bin/Debug/
+/src/power-bi-connector/AmazonDocumentDBConnector/obj/
+/src/power-bi-connector/AmazonDocumentDBConnector/.vs/
 src/aws-sdk-cpp/
 default.profraw
 test_output.html

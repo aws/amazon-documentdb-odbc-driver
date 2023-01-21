@@ -737,7 +737,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_EXPRESSIONS_IN_ORDERBY
   // A character string: "Y" if the data source supports expressions in the
   // ORDER BY list; "N" if it does not.
-  strParams[SQL_EXPRESSIONS_IN_ORDERBY] = "Y";
+  strParams[SQL_EXPRESSIONS_IN_ORDERBY] = "N";
 #endif  // SQL_EXPRESSIONS_IN_ORDERBY
 
 #ifdef SQL_INTEGRITY
@@ -786,7 +786,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // the percent character (%) and underscore character (_) in a LIKE predicate
   // and the driver supports the ODBC syntax for defining a LIKE predicate
   // escape character; "N" otherwise.
-  strParams[SQL_LIKE_ESCAPE_CLAUSE] = "N";
+  strParams[SQL_LIKE_ESCAPE_CLAUSE] = "Y";
 #endif  // SQL_LIKE_ESCAPE_CLAUSE
 
 #ifdef SQL_MAX_ROW_SIZE_INCLUDES_LONG
@@ -806,13 +806,13 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // A character string: "Y" if the driver supports more than one active
   // transaction at the same time, "N" if only one transaction can be active at
   // any time.
-  strParams[SQL_MULTIPLE_ACTIVE_TXN] = "Y";
+  strParams[SQL_MULTIPLE_ACTIVE_TXN] = "N";
 #endif  // SQL_MULTIPLE_ACTIVE_TXN
 
 #ifdef SQL_ORDER_BY_COLUMNS_IN_SELECT
   // A character string: "Y" if the columns in the ORDER BY clause must be in
   // the select list; otherwise, "N".
-  strParams[SQL_ORDER_BY_COLUMNS_IN_SELECT] = "N";
+  strParams[SQL_ORDER_BY_COLUMNS_IN_SELECT] = "Y";
 #endif  // SQL_ORDER_BY_COLUMNS_IN_SELECT
 
 #ifdef SQL_PROCEDURE_TERM
@@ -1009,12 +1009,12 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_ODBC_INTERFACE_CONFORMANCE
   // Indicates the level of the ODBC 3.x interface that the driver
   // complies with.
-  intParams[SQL_ODBC_INTERFACE_CONFORMANCE] = SQL_OIC_CORE;
+  intParams[SQL_ODBC_INTERFACE_CONFORMANCE] = SQL_OIC_LEVEL1;
 #endif  // SQL_ODBC_INTERFACE_CONFORMANCE
 
 #ifdef SQL_SQL_CONFORMANCE
   // Indicates the level of SQL-92 supported by the driver.
-  intParams[SQL_SQL_CONFORMANCE] = SQL_SC_SQL92_ENTRY;
+  intParams[SQL_SQL_CONFORMANCE] = SQL_SC_SQL92_FULL;
 #endif  // SQL_SQL_CONFORMANCE
 
 #ifdef SQL_CATALOG_USAGE
@@ -1130,7 +1130,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_CONVERT_FUNCTIONS
   // Bitmask enumerating the scalar conversion functions supported by the driver
   // and associated data source.
-  intParams[SQL_CONVERT_FUNCTIONS] = SQL_FN_CVT_CONVERT | SQL_FN_CVT_CAST;
+  intParams[SQL_CONVERT_FUNCTIONS] = SQL_FN_CVT_CAST;
 #endif  // SQL_CONVERT_FUNCTIONS
 
 #ifdef SQL_OJ_CAPABILITIES
@@ -1498,7 +1498,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //     parameters. This is conceptually equivalent to treating the statement
   //     together with the complete parameter array as one atomic unit. Errors
   //     are handled the same as if one statement were executed.
-  intParams[SQL_PARAM_ARRAY_ROW_COUNTS] = SQL_PARC_BATCH;
+  intParams[SQL_PARAM_ARRAY_ROW_COUNTS] = SQL_PARC_NO_BATCH;
 #endif  // SQL_PARAM_ARRAY_ROW_COUNTS
 
 #ifdef SQL_PARAM_ARRAY_SELECTS
@@ -2294,7 +2294,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Value that specifies the maximum number of active concurrent statements in
   // asynchronous mode that the driver can support on a given connection. If
   // there is no specific limit or the limit is unknown, this value is zero.
-  intParams[SQL_MAX_ASYNC_CONCURRENT_STATEMENTS] = 0;  // I.e., unknown
+  intParams[SQL_MAX_ASYNC_CONCURRENT_STATEMENTS] = 1;  // I.e., unknown
 #endif  // SQL_MAX_ASYNC_CONCURRENT_STATEMENTS
 
 #ifdef SQL_MAX_BINARY_LITERAL_LEN
@@ -2435,7 +2435,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // driver complies with: SQL_SCC_XOPEN_CLI_VERSION1: The driver complies with
   // the Open Group CLI version 1. SQL_SCC_ISO92_CLI: The driver complies with
   // the ISO 92 CLI.
-  intParams[SQL_STANDARD_CLI_CONFORMANCE] = 0;  // I.e., not supported
+  intParams[SQL_STANDARD_CLI_CONFORMANCE] = SQL_SCC_ISO92_CLI;
 #endif  // SQL_STANDARD_CLI_CONFORMANCE
 
 #ifdef SQL_SUBQUERIES
@@ -2451,7 +2451,9 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // support subqueries support correlated subqueries. An SQL-92 Entry
   // level-conformant driver will always return a bitmask in which all of these
   // bits are set.
-  intParams[SQL_SUBQUERIES] = 0;  // I.e., not supported
+  intParams[SQL_SUBQUERIES] = SQL_SQ_CORRELATED_SUBQUERIES | SQL_SQ_COMPARISON
+                              | SQL_SQ_EXISTS | SQL_SQ_IN
+                              | SQL_SQ_QUANTIFIED;
 #endif  // SQL_SUBQUERIES
 
 #ifdef SQL_TXN_ISOLATION_OPTION
@@ -2523,7 +2525,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_OSC_MINIMUM = Minimum grammar supported
   // SQL_OSC_CORE = Core grammar supported
   // SQL_OSC_EXTENDED = Extended grammar supported
-  intParams[SQL_ODBC_SQL_CONFORMANCE] = SQL_OSC_CORE;
+  intParams[SQL_ODBC_SQL_CONFORMANCE] = SQL_OSC_EXTENDED;
 #endif  // SQL_ODBC_SQL_CONFORMANCE
 
 #ifdef SQL_POSITIONED_STATEMENTS
@@ -2587,7 +2589,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_MAX_CONCURRENT_ACTIVITIES
   // The maximum number of active statements that the driver can  support for a
   // connection. Zero mean no limit.
-  shortParams[SQL_MAX_CONCURRENT_ACTIVITIES] = 0;  // I.e., no limit
+  shortParams[SQL_MAX_CONCURRENT_ACTIVITIES] = 1;  // I.e., only one.
 #endif  // SQL_MAX_CONCURRENT_ACTIVITIES
 
 #ifdef SQL_TXN_CAPABLE
@@ -2613,7 +2615,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // columns: SQL_CB_NULL = Result is NULL valued. SQL_CB_NON_NULL = Result is
   // concatenation of non - NULL valued column or columns. An SQL - 92 Entry
   // level-conformant driver will always return SQL_CB_NULL.
-  shortParams[SQL_CONCAT_NULL_BEHAVIOR] = SQL_CB_NULL;
+  shortParams[SQL_CONCAT_NULL_BEHAVIOR] = SQL_CB_NON_NULL;
 #endif  // SQL_CONCAT_NULL_BEHAVIOR
 
 #ifdef SQL_CORRELATION_NAME
@@ -2683,7 +2685,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // level-conformant driver will always return the SQL_GB_COLLATE option as
   // supported. If none of the options is supported, the GROUP BY clause is not
   // supported by the data source.
-  shortParams[SQL_GROUP_BY] = SQL_GB_GROUP_BY_EQUALS_SELECT;
+  shortParams[SQL_GROUP_BY] = SQL_GB_GROUP_BY_CONTAINS_SELECT;
 #endif  // SQL_GROUP_BY
 
 #ifdef SQL_IDENTIFIER_CASE
