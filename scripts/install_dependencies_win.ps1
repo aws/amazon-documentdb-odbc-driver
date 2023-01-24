@@ -52,6 +52,12 @@ try {
 	elseif ( -not $(Install-MongoDb) ) {
 		return 1
 	}
+	elseif ( -not $(Install-AwsCli) ) {
+		return 1
+	}
+	elseif ( -not $(Install-Jq) ) {
+		return 1
+	}
 
 	Write-Host "Installation completed."
 	return
