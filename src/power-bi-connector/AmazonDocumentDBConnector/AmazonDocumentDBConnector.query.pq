@@ -1,8 +1,14 @@
-﻿section AmazonDocumentDBConnectorUnitTests;
+﻿section AmazonDocumentDBUnitTests;
 
-shared AmazonDocumentDBConnector.UnitTest =
+shared AmazonDocumentDB.UnitTest =
 [
-    Source = AmazonDocumentDBConnector.Contents("localhost", 27017, "odbc-test", false, null, null, false, null, null, null, null, null, null, 1000, "_default", false, "Error", null, true, "Primary", 0, null, 2000),
+    // Create a user DSN with the following properties
+    // Data Source Name: "DocumentDB-PowerBI-Connector"
+    // Hostname: localhost
+    // Port: 27017
+    // Database: odbc-test
+    // Enable TLS: false (unchecked)
+    Source = AmazonDocumentDB.Contents("DocumentDB-PowerBI-Connector"),
     odbc_test = Source{[Name="odbc-test",Kind="Schema"]}[Data],
     api_robustness_test_001 = odbc_test{[Name="api_robustness_test_001",Kind="Table"]}[Data],
 

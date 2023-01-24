@@ -24,6 +24,10 @@
 
 #include <boost/optional.hpp>
 
+#ifndef DOCUMENTDB_SQL_MAX_LENGTH
+#define DOCUMENTDB_SQL_MAX_LENGTH 65532
+#endif  // DOCUMENTDB_SQL_MAX_LENGTH
+
 namespace documentdb {
 namespace odbc {
 namespace type_traits {
@@ -143,6 +147,15 @@ class SqlTypeName {
 
   /** BIGINT SQL type name constant. */
   static const std::string BIGINT;
+
+  /** CHAR SQL type name constant. */
+  static const std::string CHAR;
+
+  /** VARCHAR SQL type name constant. */
+  static const std::string VARCHAR;
+
+  /** LONGVARCHAR SQL type name constant. */
+  static const std::string LONGVARCHAR;
 
   /** NCHAR SQL type name constant. */
   static const std::string NCHAR;

@@ -337,21 +337,46 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     }
 
     case ResultColumn::LITERAL_PREFIX: {
-      if (currentType == JDBC_TYPE_VARCHAR)
-        buffer.PutString("'");
-      else if (currentType == DOCUMENTDB_TYPE_BINARY)
-        buffer.PutString("0x");
-      else
-        buffer.PutNull();
+      switch (currentType) {
+        case JDBC_TYPE_CHAR:
+        case JDBC_TYPE_VARCHAR:
+        case JDBC_TYPE_LONGVARCHAR:
+        case JDBC_TYPE_NCHAR:
+        case JDBC_TYPE_NVARCHAR:
+        case JDBC_TYPE_LONGNVARCHAR:
+          buffer.PutString("'");
+          break;
+
+        case JDBC_TYPE_BINARY:
+        case JDBC_TYPE_VARBINARY:
+        case JDBC_TYPE_LONGVARBINARY:
+        case DOCUMENTDB_TYPE_BINARY:
+          buffer.PutString("0x");
+          break;
+
+        default:
+          buffer.PutNull();
+          break;
+      }
 
       break;
     }
 
     case ResultColumn::LITERAL_SUFFIX: {
-      if (currentType == JDBC_TYPE_VARCHAR)
-        buffer.PutString("'");
-      else
-        buffer.PutNull();
+      switch (currentType) {
+        case JDBC_TYPE_CHAR:
+        case JDBC_TYPE_VARCHAR:
+        case JDBC_TYPE_LONGVARCHAR:
+        case JDBC_TYPE_NCHAR:
+        case JDBC_TYPE_NVARCHAR:
+        case JDBC_TYPE_LONGNVARCHAR:
+          buffer.PutString("'");
+          break;
+
+        default:
+          buffer.PutNull();
+          break;
+      }
 
       break;
     }
