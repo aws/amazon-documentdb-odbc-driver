@@ -206,16 +206,6 @@ Related function: `SQLSetStmtAttr`
 To support BI tools that may use the SQLPrepare interface in auto-generated queries, the driver
 supports the use of SQLPrepare. However, the use of parameters in queries (values left as ?) is not supported in SQLPrepare, SQLExecute and SQLExecDirect. 
 
-### PowerBI Power Query Editor limitation
-
-There is a limiation while trying to filter data in Power Query Editor. Power BI will throw an error that the query is not supported after you try to close & apply the changes.
-Example:
-- Filter a column on Power Query Editor ![Power Query Editor filter](../images/powerbi-filter.png)
-- Click on Close & Apply ![Power Query Editor close and apply](../images/power-bi-filter-close-and-apply.png)
-- Error dialog ![error on dashboard](../images/powerbi-filter-error.png)
-
-Note: This filter limitation is only on Power Query Editor window. Filters will work while using Power BI dashboard.
-
 ## Unimplemented ODBC API
 
 The following ODBC API are currently unimplemented but are planned to be implemented in the future.
@@ -249,9 +239,25 @@ The following ODBC API are not supported and there is no plan to support these A
 - SQLSetScrollOptions
 - SQLTablePrivileges
 
-## PowerBI Desktop cannot load the DocumentDB ODBC driver library
+
+## Power BI known issues
+### PowerBI Desktop cannot load the DocumentDB ODBC driver library
 
 If you downloaded Power BI Desktop from the Microsoft Store, you may be unable to use the Amazon DocumentDB ODBC driver due to a loading issue. To address this, download Power BI Desktop from the [Download Center](https://www.microsoft.com/download/details.aspx?id=58494) instead of the Microsoft Store.
+
+### Direct Query not able to load timestamp
+
+When a timestamp column is selected the following error will be shown
+* If the Log Level is set to Error ![timestamp_log_level_error](../images/timestamp_powerbi_log_level_error.png)
+* If the Log Level is set to Debug ![timestamp_log_level_debug](../images/timestamp_powerbi_log_level_debug.png)
+
+This error is related to Calcite, third party library used to translate SQL query to DocumentDB aggregation pipeline,
+[issue](https://issues.apache.org/jira/browse/CALCITE-5483).
+
+To workaround this issue you will need to click in the chevron-down icon of the problematic column and select **show
+items with no data** in the Visualizations menu. ![timestamp_workaround](../images/timestamp_powerbi_workaround.png)
+
+
 
 ## Limitations on NUMERIC and DECIMAL Literals
 
