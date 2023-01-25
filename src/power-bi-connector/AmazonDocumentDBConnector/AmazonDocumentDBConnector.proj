@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildMez">
+  <PropertyGroup>
+    <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildProjectDirectory)\bin\</OutputPath>
+    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildProjectDirectory)\obj\</IntermediateOutputPath>
+    <MezIntermediatePath>$(IntermediateOutputPath)MEZ\</MezIntermediatePath>
+    <MezOutputPath>$(OutputPath)$(MsBuildProjectName).mez</MezOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <MezContent Include="AmazonDocumentDBConnector.pq" />
+    <MezContent Include="AmazonDocumentDBConnector16.png" />
+    <MezContent Include="AmazonDocumentDBConnector20.png" />
+    <MezContent Include="AmazonDocumentDBConnector24.png" />
+    <MezContent Include="AmazonDocumentDBConnector32.png" />
+    <MezContent Include="AmazonDocumentDBConnector40.png" />
+    <MezContent Include="AmazonDocumentDBConnector48.png" />
+    <MezContent Include="AmazonDocumentDBConnector64.png" />
+    <MezContent Include="AmazonDocumentDBConnector80.png" />
+    <MezContent Include="resources.resx" />
+  </ItemGroup>
+  <Target Name="BuildMez" AfterTargets="Build" Inputs="@(MezContent)" Outputs="$(MezOutputPath)">
+    <RemoveDir Directories="$(MezIntermediatePath)" />
+    <Copy SourceFiles="@(MezContent)" DestinationFolder="$(MezIntermediatePath)" />
+    <MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')" />
+    <ZipDirectory SourceDirectory="$(MezIntermediatePath)" DestinationFile="$(MezOutputPath)" Overwrite="true" />
+  </Target>
+  <Target Name="Clean">
+    <RemoveDir Directories="$(MezIntermediatePath)" />
+    <Delete Files="$(MezOutputPath)" />
+  </Target>
+</Project>
