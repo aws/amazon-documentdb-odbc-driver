@@ -479,7 +479,7 @@ function Invoke-SignFile {
     
     # Get signed EXE from S3
     Write-Host "Get signed EXE from S3 to $TargetPath"
-    aws s3api get-object --bucket $AwsSignedBucket --key $AwsSignedBucket-$jobId $TargetPath
+    aws s3api get-object --bucket $AwsSignedBucket --key $AwsKey-$jobId $TargetPath
     
     Write-Host "Signing completed"
     return $true
