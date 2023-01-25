@@ -383,3 +383,31 @@ function Install-WixToolset {
 
     return $true
 }
+
+function Install-AwsCli {
+    [OutputType([Boolean])]
+    Param()
+
+    if ( -not $(Confirm-RunAsAdministrator) ) {
+        Invoke-RunAsAdministrator -Wait "choco" "upgrade awscli -y"
+    }
+    else {
+        choco upgrade awscli -y
+    }
+
+    return $true
+}
+
+function Install-Jq {
+    [OutputType([Boolean])]
+    Param()
+
+    if ( -not $(Confirm-RunAsAdministrator) ) {
+        Invoke-RunAsAdministrator -Wait "choco" "upgrade jq -y"
+    }
+    else {
+        choco upgrade jq -y
+    }
+
+    return $true
+}
