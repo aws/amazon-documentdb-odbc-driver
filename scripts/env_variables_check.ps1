@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+$scriptPath = Split-Path -parent $PSCommandPath
+$projectPath = Split-Path -parent $scriptPath
 $CHECK=1
 
 if ( [string]::IsNullOrEmpty(${Env:DOC_DB_USER_NAME}) ) {
@@ -63,11 +65,20 @@ if ( [string]::IsNullOrEmpty(${Env:JAVA_HOME}) ) {
 
 if ( [string]::IsNullOrEmpty(${Env:DOCUMENTDB_HOME}) ) {
   Write-Output "DOCUMENTDB_HOME environment variable is not set. Using default."
-  $Env:DOCUMENTDB_HOME="${scriptPath}\..\build\odbc\bin\Debug"
+  $Env:DOCUMENTDB_HOME="${projectPath}\build\odbc\bin\Debug"
   [System.Environment]::SetEnvironmentVariable('DOCUMENTDB_HOME', $Env:DOCUMENTDB_HOME, [System.EnvironmentVariableTarget]::User)
   Write-Output "DOCUMENTDB_HOME=$Env:DOCUMENTDB_HOME"
 } else {
   Write-Output "DOCUMENTDB_HOME=$Env:DOCUMENTDB_HOME"
+}
+
+if ( [string]::IsNullOrEmpty(${Env:VCPKG_ROOT}) ) {
+  Write-Output "VCPKG_ROOT environment variable is not set. Using default."
+  $Env:VCPKG_ROOT="C:\VCPKG"
+  [System.Environment]::SetEnvironmentVariable('VCPKG_ROOT', $Env:VCPKG_ROOT, [System.EnvironmentVariableTarget]::User)
+  Write-Output "VCPKG_ROOT=$Env:VCPKG_ROOT"
+} else {
+  Write-Output "VCPKG_ROOT=$Env:VCPKG_ROOT"
 }
 
 if ( "${CHECK}" -eq "0" ) {
