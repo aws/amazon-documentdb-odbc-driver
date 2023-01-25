@@ -212,13 +212,13 @@ jobs:
       with:
         name: docdb-odbc-driver-win32-${{env.ODBC_DRIVER_VERSION}}
         path: |
-          build/odbc/cmake/Release/*.dll
-          build/odbc/cmake/Release/*.msi
-          build/odbc/cmake/Release/*.exe
-          build/odbc/cmake/Release/*.pdb
-          !build/odbc/cmake/Release/images
-          !build/odbc/cmake/Release/jpackage-resources
-          !build/odbc/cmake/Release/runtime-image
+          ${{env.ODBC_BIN_PATH}}/*.dll
+          ${{env.ODBC_BIN_PATH}}/*.msi
+          ${{env.ODBC_BIN_PATH}}/*.exe
+          ${{env.ODBC_BIN_PATH}}/*.pdb
+          !${{env.ODBC_BIN_PATH}}/images
+          !${{env.ODBC_BIN_PATH}}/jpackage-resources
+          !${{env.ODBC_BIN_PATH}}/runtime-image
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
@@ -427,13 +427,13 @@ jobs:
       with:
         name: docdb-odbc-driver-amd64-${{env.ODBC_DRIVER_VERSION}}
         path: |
-          build/odbc/cmake/Release/*.dll
-          build/odbc/cmake/Release/*.msi
-          build/odbc/cmake/Release/*.exe
-          build/odbc/cmake/Release/*.pdb
-          !build/odbc/cmake/Release/images
-          !build/odbc/cmake/Release/jpackage-resources
-          !build/odbc/cmake/Release/runtime-image
+          ${{env.ODBC_BIN_PATH}}/*.dll
+          ${{env.ODBC_BIN_PATH}}/*.msi
+          ${{env.ODBC_BIN_PATH}}/*.exe
+          ${{env.ODBC_BIN_PATH}}/*.pdb
+          !${{env.ODBC_BIN_PATH}}/images
+          !${{env.ODBC_BIN_PATH}}/jpackage-resources
+          !${{env.ODBC_BIN_PATH}}/runtime-image
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
