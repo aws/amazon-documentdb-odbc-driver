@@ -229,12 +229,22 @@ std::string CreateDocumentDbHomeClasspath(const std::string& home,
 
   // 2. Add regular jars from "libs" folder excluding "optional".
   std::string libsPath = home + "\\libs";
+  std::string appPath = home + "\\app";
+  std::string jarLibsPath;
+  bool folderExists = false;
 
   if (FileExists(libsPath)) {
-    res.append(ClasspathJars(libsPath));
+    jarLibsPath = libsPath;
+  } else if (FileExists(appPath)) {
+    // Using jpackage, the jar library is stored in the 'app' subdirectory
+    jarLibsPath = appPath;
+  }
+
+  if (!jarLibsPath.empty() && FileExists(jarLibsPath)) {
+    res.append(ClasspathJars(jarLibsPath));
 
     // Append inner directories.
-    std::string libsSearchPath = libsPath + "\\*";
+    std::string libsSearchPath = jarLibsPath + "\\*";
 
     WIN32_FIND_DATAA libsFindData;
 
@@ -248,7 +258,7 @@ std::string CreateDocumentDbHomeClasspath(const std::string& home,
           if (libsChildPath.compare(".") != 0
               && libsChildPath.compare("..") != 0
               && libsChildPath.compare("optional") != 0) {
-            std::string libsFolder = libsPath + "\\" + libsChildPath;
+            std::string libsFolder = jarLibsPath + "\\" + libsChildPath;
 
             res.append(ClasspathJars(libsFolder));
           }

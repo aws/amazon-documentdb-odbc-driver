@@ -252,12 +252,21 @@ std::string CreateDocumentDbHomeClasspath(const std::string& home,
 
   // 2. Add regular jars from "libs" folder excluding "optional".
   std::string libsPath = home + "/libs";
+  std::string appPath = home + "/app";
+  std::string jarLibsPath;
 
   if (FileExists(libsPath)) {
-    res.append(ClasspathJars(libsPath));
+    jarLibsPath = libsPath;
+  } else if (FileExists(appPath)) {
+    // Using jpackage, the jar library is stored in the 'app' subdirectory
+    jarLibsPath = appPath;
+  }
+
+  if (!jarLibsPath.empty() && FileExists(jarLibsPath)) {
+    res.append(ClasspathJars(jarLibsPath));
 
     // Append inner directories.
-    DIR* dir = opendir(libsPath.c_str());
+    DIR* dir = opendir(jarLibsPath.c_str());
 
     if (dir) {
       struct dirent* entry;
@@ -267,7 +276,7 @@ std::string CreateDocumentDbHomeClasspath(const std::string& home,
 
         if (entryPath.compare(".") != 0 && entryPath.compare("..") != 0
             && entryPath.compare("optional") != 0) {
-          std::string entryFullPath = libsPath;
+          std::string entryFullPath = jarLibsPath;
 
           entryFullPath.append("/");
           entryFullPath.append(entryPath);

@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
+#include <iostream>
 #include <chrono>
 #include <ctime>
+#include <boost/date_time/date_facet.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "documentdb/odbc/documentdb_column.h"
 #include <documentdb/odbc/impl/interop/interop_stream_position_guard.h>
 #include "documentdb/odbc/utility.h"
@@ -147,11 +150,11 @@ ConversionResult::Type DocumentDbColumn::PutInt16(
       value = element.get_bool().value ? 1 : 0;
       break;
     case bsoncxx::type::k_date:
-      value = element.get_date().value.count();
+      value = static_cast< int16_t >(element.get_date().to_int64());
       break;
-    case bsoncxx::type::k_timestamp:
-      value = element.get_timestamp().timestamp;
-      break;
+    case bsoncxx::type::k_timestamp: {
+      value = static_cast< int16_t >(element.get_timestamp().timestamp);
+    } break;
     case bsoncxx::type::k_null:
       break;
     default:
@@ -198,11 +201,11 @@ ConversionResult::Type DocumentDbColumn::PutInt32(
       value = element.get_bool().value ? 1 : 0;
       break;
     case bsoncxx::type::k_date:
-      value = element.get_date().value.count();
+      value = static_cast< int32_t >(element.get_date().to_int64());
       break;
-    case bsoncxx::type::k_timestamp:
-      value = element.get_timestamp().timestamp;
-      break;
+    case bsoncxx::type::k_timestamp: {
+      value = static_cast< int32_t >(element.get_timestamp().timestamp);
+    } break;
     case bsoncxx::type::k_null:
       break;
     default:
@@ -248,10 +251,10 @@ ConversionResult::Type DocumentDbColumn::PutInt64(
       value = element.get_bool().value ? 1 : 0;
       break;
     case bsoncxx::type::k_date:
-      value = element.get_date().value.count();
+      value = element.get_date().to_int64();
       break;
     case bsoncxx::type::k_timestamp:
-      value = element.get_timestamp().timestamp;
+      value = static_cast< int64_t >(element.get_timestamp().timestamp);
       break;
     case bsoncxx::type::k_null:
       break;
@@ -291,7 +294,7 @@ ConversionResult::Type DocumentDbColumn::PutFloat(
       value = element.get_bool().value ? 1 : 0;
       break;
     case bsoncxx::type::k_date:
-      value = element.get_date().value.count();
+      value = element.get_date().to_int64();
       break;
     case bsoncxx::type::k_timestamp:
       value = element.get_timestamp().timestamp;
@@ -334,7 +337,7 @@ ConversionResult::Type DocumentDbColumn::PutDouble(
       value = element.get_bool().value ? 1 : 0;
       break;
     case bsoncxx::type::k_date:
-      value = element.get_date().value.count();
+      value = element.get_date().to_int64();
       break;
     case bsoncxx::type::k_timestamp:
       value = element.get_timestamp().timestamp;
@@ -349,6 +352,29 @@ ConversionResult::Type DocumentDbColumn::PutDouble(
     dataBuf.PutDouble(value);
   }
   return convRes;
+}
+
+boost::posix_time::ptime ToPosixTime(const int64_t milliSecsSinceEpoch) {
+  using Seconds = std::chrono::seconds;
+  using Milliseconds = std::chrono::milliseconds;
+  // Convert to seconds for time_t
+  auto secsSinceEpoch =
+      std::chrono::duration_cast< Seconds >(Milliseconds(milliSecsSinceEpoch));
+  return boost::posix_time::from_time_t(
+      static_cast< time_t >(secsSinceEpoch.count()));
+}
+
+boost::posix_time::ptime ToPosixTime(const uint32_t secsSinceEpoch) {
+  return boost::posix_time::from_time_t(static_cast< time_t >(secsSinceEpoch));
+}
+
+std::string ToString(const boost::posix_time::ptime& dateTime) {
+  std::ostringstream os;
+  static std::locale loc(
+      os.getloc(), new boost::posix_time::time_facet("%Y-%m-%d %H:%M:%S"));
+  os.imbue(loc);
+  os << dateTime;
+  return os.str();
 }
 
 ConversionResult::Type DocumentDbColumn::PutString(
@@ -390,13 +416,16 @@ ConversionResult::Type DocumentDbColumn::PutString(
     case bsoncxx::type::k_bool:
       value = std::to_string(element.get_bool().value);
       break;
-    case bsoncxx::type::k_date:
-      value = std::to_string(std::chrono::system_clock::to_time_t(
-          std::chrono::system_clock::time_point(element.get_date().value)));
-      break;
-    case bsoncxx::type::k_timestamp:
-      value = std::to_string(element.get_timestamp().timestamp);
-      break;
+    case bsoncxx::type::k_date: {
+      // Number of milliseconds before/after Epoch.
+      auto dateTime = ToPosixTime(element.get_date().to_int64());
+      value = ToString(dateTime);
+    } break;
+    case bsoncxx::type::k_timestamp: {
+      // Number of (non-negative) seconds after Epoch.
+      auto dateTime = ToPosixTime(element.get_timestamp().timestamp);
+      value = ToString(dateTime);
+    } break;
     case bsoncxx::type::k_null:
       break;
     case bsoncxx::type::k_maxkey:
@@ -466,16 +495,18 @@ ConversionResult::Type DocumentDbColumn::PutTime(
   boost::optional< Time > value{};
   switch (docType) {
     case bsoncxx::type::k_int64:
-      break;
       value = Time(element.get_int64().value);
+      break;
     case bsoncxx::type::k_date:
-      value = Time(element.get_date().value.count());
+      value = Time(element.get_date().to_int64());
       break;
-    case bsoncxx::type::k_timestamp:
-      // TODO: Determine if this is correct to milliseconds
-      // https://bitquill.atlassian.net/browse/AD-679
-      value = Time(element.get_timestamp().timestamp);
-      break;
+    case bsoncxx::type::k_timestamp: {
+      // Convert from seconds after Epoch
+      auto milliSecsFromEpoch =
+          std::chrono::duration_cast< std::chrono::milliseconds >(
+              std::chrono::seconds(element.get_timestamp().timestamp));
+      value = Time(milliSecsFromEpoch.count());
+    } break;
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
       // https://bitquill.atlassian.net/browse/AD-680
@@ -502,13 +533,15 @@ ConversionResult::Type DocumentDbColumn::PutDate(
       break;
       value = Date(element.get_int64().value);
     case bsoncxx::type::k_date:
-      value = Date(element.get_date().value.count());
+      value = Date(element.get_date().to_int64());
       break;
-    case bsoncxx::type::k_timestamp:
-      // TODO: Determine if this is correct to milliseconds
-      // https://bitquill.atlassian.net/browse/AD-679
-      value = Date(element.get_timestamp().timestamp);
-      break;
+    case bsoncxx::type::k_timestamp: {
+      // Convert from seconds after Epoch
+      auto milliSecsFromEpoch =
+          std::chrono::duration_cast< std::chrono::milliseconds >(
+              std::chrono::seconds(element.get_timestamp().timestamp));
+      value = Date(milliSecsFromEpoch.count());
+    } break;
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
       // https://bitquill.atlassian.net/browse/AD-680
@@ -534,14 +567,13 @@ ConversionResult::Type DocumentDbColumn::PutTimestamp(
     case bsoncxx::type::k_int64:
       value = Timestamp(element.get_int64().value);
       break;
-    case bsoncxx::type::k_date:
-      value = Timestamp(element.get_date().value.count());
-      break;
-    case bsoncxx::type::k_timestamp:
-      // TODO: Determine if this is correct to milliseconds
-      // https://bitquill.atlassian.net/browse/AD-679
-      value = Timestamp(element.get_timestamp().timestamp);
-      break;
+    case bsoncxx::type::k_date: {
+      value = Timestamp(element.get_date().to_int64());
+    } break;
+    case bsoncxx::type::k_timestamp: {
+      // MongoDB Timestamp is the number of seconds since the epoch.
+      value = Timestamp(element.get_timestamp().timestamp, 0);
+    } break;
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
       // https://bitquill.atlassian.net/browse/AD-680

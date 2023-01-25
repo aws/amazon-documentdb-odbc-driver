@@ -13,7 +13,7 @@
     },
     "fieldBoolean": true,
     "fieldDate": {
-      "$date": "2020-01-01T00:00:00Z"
+      "$date": "1920-01-01T00:00:00Z"
     },
     "fieldInt": 2147483647,
     "fieldLong": 9223372036854775807,
@@ -28,6 +28,12 @@
       "$binary": {
         "base64": "AAEC",
         "subType": "00"
+      }
+    },
+    "fieldTimestamp": {
+      "$timestamp": {
+        "t": 63071999,
+        "i": 1
       }
     }
   }

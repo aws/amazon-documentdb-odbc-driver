@@ -9,8 +9,16 @@ on:
     branches:
       - main
       - develop
+  workflow_dispatch:
+    inputs:
+      sign:
+        description: Build and Sign Artifacts (for release only)
+        type: boolean
+        required: false
+        default: false
 
 env:
+  SIGNING_ENABLED: ${{ github.event.inputs.sign }}
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
   ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin/Release"
@@ -31,7 +39,7 @@ env:
   DOC_DB_LOG_LEVEL: "debug"
   MONGO_IMPORT_COMMAND: "mongoimport.exe"
   # Artifacts are created when pushing to develop branch on merge of pull requests.
-  SHOULD_CREATE_ARTIFACTS: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+  SHOULD_CREATE_ARTIFACTS: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop') || github.event.inputs.sign == true || github.event.inputs.sign == 'true' }}
 
 jobs:
   trufflehog-git-secrets-scan:
@@ -62,6 +70,15 @@ jobs:
     needs: trufflehog-git-secrets-scan
     steps:
     - uses: actions/checkout@v2
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-skip-session-tagging: true
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+        role-duration-seconds: 3600
     # TODO Reactivate cppcheck
     # https://bitquill.atlassian.net/browse/AD-752
     # - name: setup-cppcheck
@@ -162,7 +179,10 @@ jobs:
         cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
 
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x86-windows openssl:x86-windows boost-test:x86-windows boost-asio:x86-windows boost-chrono:x86-windows boost-interprocess:x86-windows boost-regex:x86-windows boost-system:x86-windows boost-thread:x86-windows
+      shell: pwsh
+      run: |
+        . ./scripts/functions_win.ps1
+        Install-VcpkgPackages -Triplet x86-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
 
@@ -171,6 +191,63 @@ jobs:
         .\build_win_release32.ps1
       env:
         OPENSSL_ROOT_DIR: '${{ env.VCPKG_ROOT }}/packages/openssl_x86-windows'
+
+    - name: Sign Executables
+      id: sign-executables-32
+      shell: bash
+      run: |
+        
+        echo "Sign is set to ${SIGNING_ENABLED}"
+        if [[ $SIGNING_ENABLED = "true" ]]
+        then
+          echo "Signing is enabled. Will attempt to sign"
+          pwd
+          ls -l ./build/odbc/cmake/Release/
+        
+          echo "Installing jq"
+          choco install jq
+        
+          # Upload unsigned .exe to S3 Bucket
+          echo "Obtaining version id and uploading unsigned .exe to S3 Bucket"
+          version_id=$( aws s3api put-object --bucket ${{ secrets.AWS_UNSIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }} --body ./build/odbc/cmake/Release/documentdb-odbc-x86-${{env.ODBC_DRIVER_VERSION}}-all.exe  --acl bucket-owner-full-control | jq '.VersionId' )
+          job_id=""
+          # Attempt to get Job ID from bucket tagging, will retry up to 3 times before exiting with a failure code.
+          # Will sleep for 5 seconds between retries.
+        
+          echo "Attempt to get Job ID from bucket tagging, will retry up to 3 times before exiting with a failure code."
+          for (( i=0; i<3; i++ ))
+          do  
+            # Get job ID
+            id=$( aws s3api get-object-tagging --bucket ${{ secrets.AWS_UNSIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }} --version-id ${version_id} | jq -r '.TagSet[0].Value' )
+            if [ $id != "null" ]
+            then
+              job_id=$id
+              break
+            fi
+        
+            echo "Will sleep for 5 seconds between retries."
+            sleep 5s
+          done
+        
+          if [[ $job_id = "" ]]
+          then
+             echo "Exiting because unable to retrieve job ID"
+             exit 1
+          fi
+        
+          # Poll signed S3 bucket to see if the signed artifact is there
+          echo "Poll signed S3 bucket to see if the signed artifact is there"
+          aws s3api wait object-exists --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }}-${job_id}
+        
+          # Get signed EXE from S3
+          echo "Get signed EXE from S3"
+          aws s3api get-object --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }}-${job_id} ./build/odbc/cmake/Release/documentdb-odbc-x86-${{env.ODBC_DRIVER_VERSION}}-all-signed.exe
+
+          echo "Signing completed"
+          ls -l ./build/odbc/cmake/Release/
+        else
+          echo "Signing will be skipped"
+        fi
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}} 
@@ -258,6 +335,15 @@ jobs:
     needs: trufflehog-git-secrets-scan
     steps:
     - uses: actions/checkout@v2
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-skip-session-tagging: true
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+        role-duration-seconds: 3600
     # TODO Reactivate cppcheck
     # https://bitquill.atlassian.net/browse/AD-752
     # - name: run-cppcheck
@@ -344,7 +430,10 @@ jobs:
         cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
         
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      shell: pwsh
+      run: |
+        . ./scripts/functions_win.ps1
+        Install-VcpkgPackages -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
 
@@ -353,6 +442,63 @@ jobs:
         .\build_win_release64.ps1
       env:
         OPENSSL_ROOT_DIR: '${{env.VCPKG_ROOT}}/packages/openssl_x64-windows'
+
+    - name: Sign Executables
+      id: sign-executables-64
+      shell: bash
+      run: |
+        
+        echo "Sign is set to ${SIGNING_ENABLED}"
+        if [[ $SIGNING_ENABLED = "true" ]]
+        then
+          echo "Signing is enabled. Will attempt to sign"
+          pwd
+          ls -l ./build/odbc/cmake/Release/
+        
+          echo "Installing jq"
+          choco install jq
+        
+          # Upload unsigned .exe to S3 Bucket
+          echo "Obtaining version id and uploading unsigned .exe to S3 Bucket"
+          version_id=$( aws s3api put-object --bucket ${{ secrets.AWS_UNSIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }} --body ./build/odbc/cmake/Release/documentdb-odbc-amd64-${{env.ODBC_DRIVER_VERSION}}-all.exe  --acl bucket-owner-full-control | jq '.VersionId' )
+          job_id=""
+          # Attempt to get Job ID from bucket tagging, will retry up to 3 times before exiting with a failure code.
+          # Will sleep for 5 seconds between retries.
+        
+          echo "Attempt to get Job ID from bucket tagging, will retry up to 3 times before exiting with a failure code."
+          for (( i=0; i<3; i++ ))
+          do  
+            # Get job ID
+            id=$( aws s3api get-object-tagging --bucket ${{ secrets.AWS_UNSIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }} --version-id ${version_id} | jq -r '.TagSet[0].Value' )
+            if [ $id != "null" ]
+            then
+              job_id=$id
+              break
+            fi
+          
+            echo "Will sleep for 5 seconds between retries."
+            sleep 5s
+          done
+          
+          if [[ $job_id = "" ]]
+          then
+             echo "Exiting because unable to retrieve job ID"
+             exit 1
+          fi
+          
+          # Poll signed S3 bucket to see if the signed artifact is there
+          echo "Poll signed S3 bucket to see if the signed artifact is there"
+          aws s3api wait object-exists --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }}-${job_id}
+          
+          # Get signed EXE from S3
+          echo "Get signed EXE from S3"
+          aws s3api get-object --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }}-${job_id} ./build/odbc/cmake/Release/documentdb-odbc-amd64-${{env.ODBC_DRIVER_VERSION}}-all-signed.exe
+
+          echo "Signing completed"
+          ls -l ./build/odbc/cmake/Release/
+        else
+          echo "Signing will be skipped"
+        fi
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
@@ -502,7 +648,10 @@ jobs:
         cp cache/jar/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar ${{env.ODBC_BIN_PATH}}/libs
   
     - name: Install dependencies Windows
-      run: vcpkg integrate install; vcpkg install mongo-cxx-driver:x64-windows openssl:x64-windows boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows
+      shell: pwsh
+      run: |
+        . ./scripts/functions_win.ps1
+        Install-VcpkgPackages -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
 
@@ -542,10 +691,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-windows64_coverage
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.pull_request.head.ref }}
-        fetch-depth: 0
+        ref: ''
 
     - name: Retrieve coverage
       uses: actions/download-artifact@v2
@@ -576,18 +724,15 @@ jobs:
         COVERAGE_BADGE="${COVERAGE_BADGE/'Code%20Coverage'/'Windows%20Code%20Coverage'}"
         curl $COVERAGE_BADGE > .github/badges/coverage_badge_windows.svg
 
-    - name: Update Repository Before Commit Badge
-      run: |
-        git pull
-
     - name: Commit Coverage Badge
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_options: '--allow-empty --no-verify'
         commit_message: Commit Code Coverage Badge
         file_pattern: '*.svg'
-        skip_fetch: true
-        skip_dirty_check: true
+        skip_fetch: false
+        skip_checkout: false
+        skip_dirty_check: false
 
     - name: Add Header for Code Coverage Summary Report
       run: |
