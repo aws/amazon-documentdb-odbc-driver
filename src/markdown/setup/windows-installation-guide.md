@@ -1,8 +1,8 @@
 # Amazon DocumentDB ODBC Driver Setup
 
 ## Install DocumentDB ODBC Driver
-1. Download the  [DocumentDB ODBC
-   documentdb-odbc-amd64-<version>-all.exe](https://github.com/aws/amazon-documentdb-odbc-driver/releases).
+1. Download the 32 bit or 64 bit [DocumentDB ODBC
+   documentdb-odbc-<bitness>-<version>-all.exe](https://github.com/aws/amazon-documentdb-odbc-driver/releases).
 2. Double-click the installer.
 3. Follow the instructions on the installer window and finish the installation.
 
