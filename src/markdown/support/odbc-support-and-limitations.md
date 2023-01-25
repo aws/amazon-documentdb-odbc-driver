@@ -287,6 +287,8 @@ There is not binary generated during the jpackage process. This is currently lim
 ### Tableau is not supported
 Out of the box, Tableau has a generic support for any ODBC driver. However, it’s mechanism for connecting is to invoke the DSN configuration dialog associated with the driver. It assumes all credentials are stored in the DSN settings, because it does not prompt for username/password. To fully support Tableau a custom ODBC connector to Tableau needs to be implemented.
 
+It is recommended to use the JDBC driver that fully supports Tableua and it is connector is certified by [Tableua](https://exchange.tableau.com/products/821).
+
 ### No support for multithreading 
 There is a limitation when a second thread try to initialize/attach on the JVM.
 
