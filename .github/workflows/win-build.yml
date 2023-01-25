@@ -18,8 +18,7 @@ on:
         default: false
 
 env:
-  #SIGNING_ENABLED: ${{ github.event.inputs.sign }}
-  SIGNING_ENABLED: "true"
+  SIGNING_ENABLED: ${{ github.event.inputs.sign }}
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
   ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin/Release"
@@ -40,8 +39,7 @@ env:
   DOC_DB_LOG_LEVEL: "debug"
   MONGO_IMPORT_COMMAND: "mongoimport.exe"
   # Artifacts are created when pushing to develop branch on merge of pull requests.
-  #SHOULD_CREATE_ARTIFACTS: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop') || github.event.inputs.sign == true || github.event.inputs.sign == 'true' }}
-  SHOULD_CREATE_ARTIFACTS: 'true'
+  SHOULD_CREATE_ARTIFACTS: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop') || github.event.inputs.sign == true || github.event.inputs.sign == 'true' }}
 
 jobs:
   trufflehog-git-secrets-scan:
