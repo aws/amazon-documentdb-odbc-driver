@@ -1,6 +1,7 @@
 # ODBC Support and Limitations
 
 ## Supported Connection Information Types
+
 | Connection Information Types | Default | Support Value Change|
 |--------|------|-------|
 | SQL_DRIVER_NAME | 'Amazon DocumentDB' | no |
@@ -178,14 +179,17 @@
 | SQL_NULL_COLLATION | SQL_NC_LOW | no |
 
 ## Supported Connection Attributes
+
 | Connection Information Types | Default | Support Value Change|
 |--------|------|-------|
 | SQL_ATTR_LOGIN_TIMEOUT | 30 | yes |
 | SQL_ATTR_CONNECTION_DEAD | N/A | no |
 
 ## Supported Statements Attributes
+
 Table of statement attributes supported by the Amazon DocumentDB ODBC driver.\
 Related function: `SQLSetStmtAttr`
+
 | Statement attribute | Default | Support Value Change|
 |--------|------|-------|
 |SQL_ATTR_PARAM_BIND_OFFSET_PTR| - | yes |
@@ -205,6 +209,18 @@ Related function: `SQLSetStmtAttr`
 
 To support BI tools that may use the SQLPrepare interface in auto-generated queries, the driver
 supports the use of SQLPrepare. However, the use of parameters in queries (values left as ?) is not supported in SQLPrepare, SQLExecute and SQLExecDirect. 
+
+### PowerBI Power Query Editor limitation
+
+There is a limiation while trying to filter data in Power Query Editor. Power BI will throw an error that the query is not supported after you try to close & apply the changes.
+
+Example:
+
+- Filter a column on Power Query Editor ![Power Query Editor filter](../images/powerbi-filter.png)
+- Click on Close & Apply ![Power Query Editor close and apply](../images/power-bi-filter-close-and-apply.png)
+- Error dialog ![error on dashboard](../images/powerbi-filter-error.png)
+
+Note: This filter limitation is only on Power Query Editor window. Filters will work while using Power BI dashboard.
 
 ## Unimplemented ODBC API
 
@@ -266,67 +282,81 @@ to a value where the non-scaled portion of the literal can be stored in a long (
 the value in the non-scaled portion exceeds the limit, you will get an exception message
 like the following: "*Numeric literal '123456789012345678901234567890.45' out of range*".
 
-To specify an arbitrary NUMERIC or DECIMAL literal, quote the numeric expression in single quotes.
+To specify an arbitrary `NUMERIC` or `DECIMAL` literal, quote the numeric expression in single quotes.
 
 ### Examples
 
 1. In this example, the non-scaled value fits into a long integer and so the numeric literal syntax can be 
    used: 
-   - `SELECT CAST(9223372036854775807.45 AS DECIMAL(20, 2)) AS "literalDecimal" 
-   FROM table`
+   - `SELECT CAST(9223372036854775807.45 AS DECIMAL(20, 2)) AS "literalDecimal" FROM table`
 
 2. In this example, the non-scaled value will not fix into a long integer and is reqiured to be
    quoted using string sytax:
-   - `SELECT CAST('12345678901234567890.45' AS DECIMAL(20, 2)) AS "literalDecimal" 
-  FROM table`
+   - `SELECT CAST('12345678901234567890.45' AS DECIMAL(20, 2)) AS "literalDecimal" FROM table`
 
 ## Known limitations
 
-
 ### No support for Excel on macOS 
+
 Although it is possible to build the source code on macOS, it still needs changes to fully support Excel on macOS. For Excel on macOS to work, SQLDescribeCol (error is not about SQLDescribeCol) need to return TABLE_QUALIFIER and TABLE_OWNER (ODBC 2.0 naming) instead of TABLE_CAT and TABLE_SCHEME (our current naming, which is ODBC 3.0).
 Note that complete ODBC 2.0 support likely would be needed for the driver to work with Excel properly. 
 
 ### No executable generated with jpackage 
+
 There is not binary generated during the jpackage process. This is currently limiting to the user use schema management command line interface. User still can use the schema management commang line interface using [java commands](https://github.com/aws/amazon-documentdb-jdbc-driver/blob/develop/src/markdown/schema/manage-schema-cli.md).
 
 ### Tableau is not supported
 Out of the box, Tableau has a generic support for any ODBC driver. However, it’s mechanism for connecting is to invoke the DSN configuration dialog associated with the driver. It assumes all credentials are stored in the DSN settings, because it does not prompt for username/password. To fully support Tableau a custom ODBC connector to Tableau needs to be implemented.
 
+It is recommended to use the JDBC driver that fully supports Tableua and it is connector is certified by [Tableua](https://exchange.tableau.com/products/821).
+
 ### No support for multithreading 
+
 There is a limitation when a second thread try to initialize/attach on the JVM.
 
-
 ### Use of Amazon RDS CA certificate in driver
+
 Currently, the standard [Amazon RDS CA root certificate](https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem) is not being bunded with the ODBC driver.
-`tls_options.ca_file("path-to-file")` does not work as expected. Note that the Amazon RDS CA root certificate is used to get metadata through JNI/JDBC interface
+`tls_options.ca_file("path-to-file")` does not work as expected. Note that the Amazon RDS CA root certificate is used to get metadata through JNI/JDBC interface.
 
-### defaultAuthDB not available on the DSN Configuration 
-Although defaultAuthDB is exposed on JDBC connection string. ODBC driver is not using this capability to connect to DocumentDB.
+### Connection parameter **defaultAuthDB** not available on the DSN Configuration 
 
+Although `defaultAuthDB` is exposed on JDBC connection string, the ODBC driver is not using this capability to connect to DocumentDB.
 
-### SQLCancel
+### SQLCancel is not supported
 
-Support SQLCancel ODBC API.
-
+SQLCancel ODBC API implementation is required for support.
 
 ### No package/installers to macOS/Linux releases
 
-Although the code has support for macOS/Linux builds, it does not have proper installers for these platforms.
+Although the code has support for macOS/Linux builds, the ODBC driver does not have proper installers for these platforms.
 
 ### Limited number of concurrent SSH tunnel
 
 There is a limitation of how many SSH tunnel can be open for an EC2 machine. This will render the driver not be able to open a connection and query the data. Specifically on Power BI, if you query more than 15 tables. Power BI will spawn sub-process for each table to query the data. In our case will open 15 sub-process and will try to open 15 SSH-tunnel ( one for each process). One of the connection will fail and because of that Power BI will cancel the query for all the sub-process.
 
 To not have this kind of issue, it is recommended to change the following [setting](https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-evaluation-configuration#in-power-bi-desktop) to be below 14.
-## roadmap
-### Dynamic Link of IODBC/UnixODBC
-Currently, the driver statically determines the size of SQLWCHAR based on the library it is compiled with.
-•	unixODBC defines SQLWCHAR as unsigned short - i.e., UTF-16
-•	iODBC defines SQLWCHAR as wchar_t - i.e., UTF-32
-Here is a solution for detecting if the iODBC manager is being used to call the driver:https://github.com/dremio/flightsql-odbc/blob/156ac3d10703c00308ff707134d65b20dd362281/odbcabstraction/encoding.cc#L24
 
-### limit log size
+### Updating the Amazon DocumentDB ODBC Driver Setup
+
+It is recommended to uninstall any older version before installing a newer version.
+
+### Microsoft Access not able to connect
+
+The driver does not support the Microsoft Access application. The driver is retuning `SQL_OAC_LEVEL1` when MSAccess calls `SQLGetInfo` for `SQL_ODBC_API_CONFORMANCE` and then MSAccess
+calls `SQLDisconnect`.
+
+## Roadmap
+
+### Dynamic Link of iODBC / UnixODBC
+
+Currently, the driver statically determines the size of `SQLWCHAR` based on the library it is compiled with.
+
+- On Linux, the driver is compiled with the unixODBC driver manager in mind which defines `SQLWCHAR` as `unsigned short` - i.e., **UTF-16**
+- On MacOS, the driver is compiled with the iODBC driver manager in mind with defines `SQLWCHAR` as `wchar_t` - i.e., **UTF-32**
+
+[Here is a solution](https://github.com/dremio/flightsql-odbc/blob/156ac3d10703c00308ff707134d65b20dd362281/odbcabstraction/encoding.cc#L24) for detecting if the iODBC manager is being used to call the driver.
+
+### Log Size Limit
 
 With Debug level of logging, running the odbc tests can produce a log file of minimum of 8 mb. If users set their driver to be debug level and forgot to change it back, their server could be filled with log files very quickly. 
-
