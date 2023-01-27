@@ -38,11 +38,11 @@ function Invoke-SignFile {
         # The name of the AWS key
         [Parameter(Mandatory=$true)]
         [string]$AwsKey,
-        [Parameter(Mandatory=$false)]
-        [bool]$AsMockResponse=$false,
         # The file extension used to retrieve information from AWS bucket
         [Parameter(Mandatory=$true)]
-        [string]$FileExtension
+        [string]$FileExtension,
+        [Parameter(Mandatory=$false)]
+        [bool]$AsMockResponse=$false
     )
 
     Write-Host "Will attempt to sign $SourcePath"
