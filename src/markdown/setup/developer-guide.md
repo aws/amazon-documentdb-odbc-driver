@@ -252,6 +252,8 @@ OpenCppCoverage is used to generate code coverage for windows, for more informat
 
 1. To set the version of the ODBC driver, update the `src/ODBC_DRIVER_VERSION.txt` file with the appropriate version.
 2. To set the version of the JDBC drvier to download and embed, update the `src/JDBC_DRIVER_VERSION.txt` file to the appropriate version. 
+3. To set the version of the Power BI connector, update the `src/power-bi-connector/AmazonDocumentDBConnector/AmazonDocumentDBConnector.pq`
+   file to the appropriate version.
 
 ## Power BI Connector
 
@@ -299,3 +301,28 @@ The project ensures quality through static and runtime components.
    1. The source project is `odbc-test`.
    1. Test platform for unit and integration tests.
    1. Checks for memory leaks and unhandled runtime exceptions.
+
+## Release Procedure
+
+1. Ensure the version is updated correctly for ODBC, JDBC and Power BI components. See [Versioning](#versioning).
+2. Run the manual GitHub workflow action for `ODBC Driver for Windows`.
+   1. Ensure `Build and Sign Artifacts (for release only)` is checked.
+   2. When the build is completed, following the link for the workflow.
+   3. Download the following artifact containers (zip files):
+      1. `docdb-odbc-driver-amd64-<version>`
+      2. `docdb-odbc-driver-win32-<version>`
+      3. `AmazonDocumentDBConnector`
+   4. From the artifact containers, extact the contents and get the following artifacts:
+      1. `documentdb-odbc-amd64-0.1.1-all-signed.exe` -> `documentdb-odbc-amd64-0.1.1-all.exe`
+      2. `documentdb-odbc-x86-0.1.1-all-signed.exe` -> `documentdb-odbc-x86-0.1.1-all.exe`
+      3. `AmazonDocumentDBConnector.mez`
+3. Create a new release
+   1. On GitHub releases page for the project, click the Draft a new release button.
+   2. Version number is `v<M.m.p>` (e.g., v1.4.3)
+   3. The Release title should be `Amazon DocumentDB ODBC Driver v<M.m.p>` (e.g. `Amazon DocumentDB ODBC Driver v1.4.3`)
+   4. For the **Previous tag**, choose the tag for the previous version from the drop-down list.
+   5. Click the **Generate release notes** button.
+   6. Add the artifacts identified above.
+   7. Enable the **Set as the latest release** option.
+   8. Click the **Publish release** button.
+   
