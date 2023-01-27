@@ -18,7 +18,8 @@ on:
         default: false
 
 env:
-  SIGNING_ENABLED: ${{ github.event.inputs.sign }}
+  #SIGNING_ENABLED: ${{ github.event.inputs.sign }}
+  SIGNING_ENABLED: true
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
   ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin/Release"
@@ -202,7 +203,7 @@ jobs:
       run: |
         . ./scripts/sign_installer.ps1
         Install-Jq
-        Invoke-SignInstaller "${{env.ODBC_BIN_PATH}}" x86 ${{env.ODBC_DRIVER_VERSION}} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
+        Invoke-SignInstaller "${{env.ODBC_BIN_PATH}}" x86 ${{env.ODBC_DRIVER_VERSION}} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }} exe
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}} 
@@ -417,7 +418,7 @@ jobs:
       run: |
         . ./scripts/sign_installer.ps1
         Install-Jq
-        Invoke-SignInstaller "${{env.ODBC_BIN_PATH}}" amd64 ${{env.ODBC_DRIVER_VERSION}} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
+        Invoke-SignInstaller "${{env.ODBC_BIN_PATH}}" amd64 ${{env.ODBC_DRIVER_VERSION}} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }} -FileExtension exe
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}

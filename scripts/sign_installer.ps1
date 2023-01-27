@@ -39,7 +39,10 @@ function Invoke-SignFile {
         [Parameter(Mandatory=$true)]
         [string]$AwsKey,
         [Parameter(Mandatory=$false)]
-        [bool]$AsMockResponse=$false
+        [bool]$AsMockResponse=$false,
+        # The file extension used to retrieve information from AWS bucket
+        [Parameter(Mandatory=$true)]
+        [string]$FileExtension
     )
 
     Write-Host "Will attempt to sign $SourcePath"
@@ -82,11 +85,11 @@ function Invoke-SignFile {
     
     # Poll signed S3 bucket to see if the signed artifact is there
     Write-Host "Poll signed S3 bucket to see if the signed artifact is there"
-    aws s3api wait object-exists --bucket $AwsSignedBucket --key $AwsKey-$jobId
+    aws s3api wait object-exists --bucket $AwsSignedBucket --key $AwsKey-$jobId.$FileExtension
     
     # Get signed EXE from S3
     Write-Host "Get signed EXE from S3 to $TargetPath"
-    aws s3api get-object --bucket $AwsSignedBucket --key $AwsKey-$jobId $TargetPath
+    aws s3api get-object --bucket $AwsSignedBucket --key $AwsKey-$jobId.$FileExtension $TargetPath
     
     Write-Host "Signing completed"
     return $true
