@@ -22,8 +22,8 @@ SSH host credentials
 2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
 Other Environment Variables
-1. `JAVA_HOME`=`<path-to-JDK-root-folder>` (e.g., `C:\Users\brucei\.jdks\corretto-17.0.6`)
-2. `DOCUMENTDB_HOME`=`<path-to-bin-ouput-folder>` (e.g., `C:\Users\brucei\GitHub\aws\amazon-documentdb-odbc-driver\build\odbc\bin\Debug`)
+1. `JAVA_HOME`=`<path-to-JDK-root-folder>` (e.g., `C:\Users\user\.jdks\corretto-17.0.6`)
+2. `DOCUMENTDB_HOME`=`<path-to-bin-ouput-folder>` (e.g., `C:\Users\user\GitHub\aws\amazon-documentdb-odbc-driver\build\odbc\bin\Debug`)
 3. `VCPKG_ROOT`=`<path-to-vcpkg-folder>` (e.g., `C:\VCPKG`)
 4. `DOC_DB_LOCAL_PORT`=`27019` (e.g., If the local port is a value other than 27019, set `DOC_DB_LOCAL_PORT` to that value.)
 5. `DOC_DB_REMOTE_PORT`=`27017` (e.g., If the remote port is a value other than 27017, set `DOC_DB_REMOTE_PORT` to that value.)
@@ -79,7 +79,8 @@ Example:
       1. Open Settings -> Apps -> Optional Features -> Under "Related Settings", click on "More Windows features", and select ".Net Framework 3.5".
       ![.NET 3.5 installation](../images/dotNet_screenshot.PNG "Example")
    6. [WiX Toolset Visual Studio 2019 Extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset)
-   7. The selected components should look similar to the following: ![Visual Studio Components](../images/visual-studio-2022-components.png "Visual Studio 2022 Components")
+   7. The selected components should look similar to the following:
+   <br>![.NET 3.5 installation](../images/visual-studio-2022-components.png)</br>
 2. Ensure PowerShell (64-bit, version 7 or greater) is installed.
    1. [Dowload and install PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2).
    2. Create a short-cut for a Developer Shell. Change the path to the `Microsoft.VisualStudio.DevShell.dll` as appropriate for
