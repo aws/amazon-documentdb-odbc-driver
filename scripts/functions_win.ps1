@@ -360,7 +360,7 @@ function Install-MongoDb {
         Invoke-ScriptRunAsAdministrator "$projectPath\scripts\reinstall_mongodb.ps1" -Wait
     }
     else {
-        "$projectPath\scripts\reinstall_mongodb.ps1"
+        . "$projectPath\scripts\reinstall_mongodb.ps1"
     }
 
     return $true
