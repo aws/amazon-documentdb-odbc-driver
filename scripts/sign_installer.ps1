@@ -82,9 +82,20 @@ function Invoke-SignFile {
 
     Write-Host "Job ID: " $jobId
     
-    # Poll signed S3 bucket to see if the signed artifact is there
+
+    # Poll signed S3 bucket to see if the signed artifact is there, will retry up to 3 times before exiting with a failure code.
+    # Will sleep for 5 seconds between retries.
     Write-Host "Poll signed S3 bucket to see if the signed artifact is there"
-    aws s3api wait object-exists --bucket $AwsSignedBucket --key $AwsKey-$jobId
+    for ( $i = 0; $i -lt 3; $i++ ) {
+        # Get job ID
+        $id=$( aws s3api wait object-exists --bucket $AwsSignedBucket --key $AwsKey-$jobId )
+        if ( $id -ne "null" ) {
+            break
+        }
+    
+        Write-Host "Will sleep for 5 seconds between retries."
+        Start-Sleep -Seconds 5
+    }
     
     # Get signed EXE from S3
     Write-Host "Get signed EXE from S3 to $TargetPath"
