@@ -18,8 +18,7 @@ on:
         default: false
 
 env:
-  #SIGNING_ENABLED: ${{ github.event.inputs.sign }}
-  SIGNING_ENABLED: true
+  SIGNING_ENABLED: ${{ github.event.inputs.sign }}
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
   ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin/Release"
