@@ -116,6 +116,6 @@ For further information on SSH tunneling , please refer to the documentation on
 
 ## Driver Setup in BI Applications
 The ODBC driver is compatible with a number of BI tools. Instructions are outlined here for:
-1. [Microsoft Power BI](microsoft-power-bi.md)
+1. [Microsoft Power BI](powerbi_custom_connector.md)
 
 For other BI tools, please refer to that tool's product documentation.
