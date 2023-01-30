@@ -49,7 +49,7 @@ function Invoke-SignFile {
         Copy-Item $SourcePath $TargetPath
         return $true
     }
-    
+
     # Upload unsigned .exe to S3 Bucket
     Write-Host "Obtaining version id and uploading unsigned .exe to S3 Bucket"
     $versionId = $( aws s3api put-object --bucket $AwsUnsignedBucket --key $AwsKey --body $SourcePath --acl bucket-owner-full-control | jq '.VersionId' )
@@ -59,7 +59,7 @@ function Invoke-SignFile {
         Write-Host "Failed to PUT unsigned file in bucket."
         return $false
     }
-    
+
     # Attempt to get Job ID from bucket tagging, will retry up to 3 times before exiting with a failure code.
     # Will sleep for 5 seconds between retries.
     Write-Host "Attempt to get Job ID from bucket tagging, will retry up to 3 times before exiting with a failure code."
@@ -70,24 +70,36 @@ function Invoke-SignFile {
             $jobId = $id
             break
         }
-    
+
         Write-Host "Will sleep for 5 seconds between retries."
         Start-Sleep -Seconds 5
     }
-    
+
     if ( $jobId -eq "" ) {
         Write-Host "Exiting because unable to retrieve job ID"
         return $false
     }
-    
-    # Poll signed S3 bucket to see if the signed artifact is there
+
+    Write-Host "Job ID: " $jobId
+
+    # Poll signed S3 bucket to see if the signed artifact is there, will retry up to 3 times before exiting with a failure code.
+    # Will sleep for 5 seconds between retries.
     Write-Host "Poll signed S3 bucket to see if the signed artifact is there"
-    aws s3api wait object-exists --bucket $AwsSignedBucket --key $AwsKey-$jobId
+    for ( $i = 0; $i -lt 3; $i++ ) {
+        aws s3api wait object-exists --bucket $AwsSignedBucket --key $AwsKey-$jobId
+        # Check if successful
+        if ( $LASTEXITCODE -eq 0 ) {
+            break
+        }
     
+        Write-Host "Will sleep for 5 seconds between retries."
+        Start-Sleep -Seconds 5
+    }
+
     # Get signed EXE from S3
     Write-Host "Get signed EXE from S3 to $TargetPath"
     aws s3api get-object --bucket $AwsSignedBucket --key $AwsKey-$jobId $TargetPath
-    
+
     Write-Host "Signing completed"
     return $true
 }
@@ -142,7 +154,7 @@ function Invoke-SignInstaller {
         Write-Host "Failed to sign installer file."
         return $false
     }
-    
+
     Write-Host "Removing unused engine files."
     if (Test-Path $unsignedEnginePath) {
         Remove-Item $unsignedEnginePath
