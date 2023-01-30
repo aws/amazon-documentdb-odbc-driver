@@ -21,6 +21,13 @@ SSH host credentials
 1. `DOC_DB_USER`=`<ssh_user>`(e.g.:`ec2-user@ec2-instance.us-east-2.compute.amazonaws.com`)
 2. `DOC_DB_PRIV_KEY_FILE`=`<path_to_ssh_host_private_key_file>`(e.g.:`~/.ssh/ssh_host.pem`)
 
+Other Environment Variables
+1. `JAVA_HOME`=`<path-to-JDK-root-folder>` (e.g., `C:\Users\user\.jdks\corretto-17.0.6`)
+2. `DOCUMENTDB_HOME`=`<path-to-bin-ouput-folder>` (e.g., `C:\Users\user\GitHub\aws\amazon-documentdb-odbc-driver\build\odbc\bin\Debug`)
+3. `VCPKG_ROOT`=`<path-to-vcpkg-folder>` (e.g., `C:\VCPKG`)
+4. `DOC_DB_LOCAL_PORT`=`27019` (e.g., If the local port is a value other than 27019, set `DOC_DB_LOCAL_PORT` to that value.)
+5. `DOC_DB_REMOTE_PORT`=`27017` (e.g., If the remote port is a value other than 27017, set `DOC_DB_REMOTE_PORT` to that value.)
+
 [`Optional`] Log configurations
 
 Set these 2 variables only if you would like to set a custom log path or log level for connection tests; it is completely optional.
@@ -68,27 +75,36 @@ Example:
    3. C++ ATL for latest v142 build tools (x86 & x64)
    4. C++ MFC for latest v142 build tools (x86 & x64)
    5. [WiX Toolset v3 Schemas for Visual Studio](https://wixtoolset.org/releases/)
-      If encountering "wix toolset requires .net 3.5.1 to be enabled", follow the steps below.
-      1. Open Settings -> Apps -> Optional Features -> Under "Related Settings", click on "More Windows features", and select ".Net Framework 3.5".
-      ![Alt text](src/markdown/images/dotNet_screenshot.PNG "Example")
+      If encountering "wix toolset requires .net 3.5.1 to be enabled", follow the steps below. Depending on which version of Windows OS you're running...
+      1. ([Windows 10/11](https://learn.microsoft.com/en-us/dotnet/framework/install/dotnet-35-windows#enable-the-net-framework-35-in-control-panel))
+      Press your Windows key (or click Start button) and search for "Turn Windows features on or off",
+      and select ".Net Framework 3.5 (includes .NET 2.0 and 3.0)".
+      <br>![.NET 3.5 installation](../images/dotNet_screenshot.PNG "Example")</br>
+      2. ([Windows Server](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/enable-net-framework-35-by-using-the-add-roles-and-features-wizard?view=windows-11))
+      Open Server Manager, and use the "Add Roles and Features Wizard" path. Follow the wizard steps and ensure to select ".Net Framework 3.5 Features".
    6. [WiX Toolset Visual Studio 2019 Extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset)
+   7. The selected components should look similar to the following:
+   <br>![.NET 3.5 installation](../images/visual-studio-2022-components.png)</br>
 2. Ensure PowerShell (64-bit, version 7 or greater) is installed.
    1. [Dowload and install PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2).
    2. Create a short-cut for a Developer Shell. Change the path to the `Microsoft.VisualStudio.DevShell.dll` as appropriate for
    your version of Visual Studio. 
       - Example short-cut path: `"C:\Program Files\PowerShell\7\pwsh.exe" -noe -c "&{Import-Module """C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"""; Enter-VsDevShell db62f8c1}"`
-2. Install Dependencies
-   1. Start a version 7 or greater PowerShell (pwsh.exe) - preferrably 
-    in ***Run as Administrator*** mode.
-   2. Change directory to the project directory.
-   3. Run the installation script `scripts\install_dependencies_win.ps1`. Note: ***This will
-   forcibly install any dependency that has not already been set (i.e, Java JDK, libraries and local MongoDB server).***
+2. Ensure `chocolatey` is installed.
+   1. Using the instructions from [chocolatey's installation instructions](https://chocolatey.org/install), install the utility
+   via a PowerShell terminal.
 2. Setup Environment Variables
    1. Start a version 7 or greater PowerShell (pwsh.exe) 
    2. Change directory to the project directory.
    3. Run the following script: `scripts\env_variables_check.ps1`
    4. For any missing environment variables, add the missing environment variable to your
    user setup.
+2. Install Dependencies
+   1. Start a version 7 or greater PowerShell (pwsh.exe) - preferrably 
+    in ***Run as Administrator*** mode.
+   2. Change directory to the project directory.
+   3. Run the installation script `scripts\install_dependencies_win.ps1`. Note: ***This will
+   forcibly install any dependency that has not already been set (i.e, Java JDK, libraries and local MongoDB server).***
 6. On the Developer PowerShell, run one of the build scripts to create an initial compilation.
    1. E.g.: `.\build_win_debug64.ps1`
    2. Navigate to the `build\odbc\cmake` folder to use the generated solution file, `DocumentDB-ODBC.C++.sln` to work on
