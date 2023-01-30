@@ -75,9 +75,13 @@ Example:
    3. C++ ATL for latest v142 build tools (x86 & x64)
    4. C++ MFC for latest v142 build tools (x86 & x64)
    5. [WiX Toolset v3 Schemas for Visual Studio](https://wixtoolset.org/releases/)
-      If encountering "wix toolset requires .net 3.5.1 to be enabled", follow the steps below.
-      1. Open Settings -> Apps -> Optional Features -> Under "Related Settings", click on "More Windows features", and select ".Net Framework 3.5".
-      ![.NET 3.5 installation](../images/dotNet_screenshot.PNG "Example")
+      If encountering "wix toolset requires .net 3.5.1 to be enabled", follow the steps below. Depending on which version of Windows OS you're running...
+      1. ([Windows 10/11](https://learn.microsoft.com/en-us/dotnet/framework/install/dotnet-35-windows#enable-the-net-framework-35-in-control-panel))
+      Press your Windows key (or click Start button) and search for "Turn Windows features on or off",
+      and select ".Net Framework 3.5 (includes .NET 2.0 and 3.0)".
+      <br>![.NET 3.5 installation](../images/dotNet_screenshot.PNG "Example")</br>
+      2. ([Windows Server](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/enable-net-framework-35-by-using-the-add-roles-and-features-wizard?view=windows-11))
+      Open Server Manager, and use the "Add Roles and Features Wizard" path. Follow the wizard steps and ensure to select ".Net Framework 3.5 Features".
    6. [WiX Toolset Visual Studio 2019 Extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset)
    7. The selected components should look similar to the following:
    <br>![.NET 3.5 installation](../images/visual-studio-2022-components.png)</br>
