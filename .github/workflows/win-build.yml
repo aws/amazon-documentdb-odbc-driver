@@ -644,6 +644,7 @@ jobs:
         curl $COVERAGE_BADGE > .github/badges/coverage_badge_windows.svg
 
     - name: Commit Coverage Badge
+      if: github.event_name == 'pull_request'
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_options: '--allow-empty --no-verify'
