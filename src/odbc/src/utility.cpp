@@ -118,9 +118,8 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
       // null-terminate target string, if room
       pOutBuffer[lenConverted] = 0;
 
-      // TODO AD-843 Complete the following comment
-      // https://bitquill.atlassian.net/browse/AD-843
-      // Note:
+      // Note: This is to detect if resulting buffer is truncated.
+      // I.e., partial result or if we did not make it to the end  of the input buffer.
       isTruncated = (result == std::codecvt_base::partial
                      || (inBufferEnd != pInBufferNext));
       break;

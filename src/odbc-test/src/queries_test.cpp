@@ -749,7 +749,7 @@ BOOST_AUTO_TEST_CASE(TestTwoRowsString) {
   BOOST_CHECK(ret == SQL_NO_DATA);
 }
 
-// TODO: Memory leak, traced by https://bitquill.atlassian.net/browse/AD-813
+// TODO: Memory leak, traced by https://github.com/aws/amazon-documentdb-odbc-driver/issues/184
 BOOST_AUTO_TEST_CASE(TestOneRowObject, *disabled()) {
   connectToLocalServer("odbc-test");
 
@@ -1029,7 +1029,7 @@ BOOST_AUTO_TEST_CASE(TestExecuteAfterCursorClose) {
   BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
 }
 
-// TODO: Memory leak, traced by https://bitquill.atlassian.net/browse/AD-813
+// TODO: Memory leak, traced by https://github.com/aws/amazon-documentdb-odbc-driver/issues/184
 BOOST_AUTO_TEST_CASE(TestCloseNonFullFetch, *disabled()) {
   connectToLocalServer("odbc-test");
 
@@ -1092,7 +1092,7 @@ BOOST_AUTO_TEST_CASE(TestErrorMessage) {
 }
 
 // TODO fix bug on logintimeoutsec on JDBC and ODBC
-// https://bitquill.atlassian.net/browse/AD-847
+// https://github.com/aws/amazon-documentdb-odbc-driver/issues/188
 BOOST_AUTO_TEST_CASE(TestLoginTimeout, *disabled()) {
   Prepare();
 
@@ -1120,7 +1120,7 @@ BOOST_AUTO_TEST_CASE(TestLoginTimeout, *disabled()) {
 }
 
 // TODO fix bug on logintimeoutsec on JDBC and ODBC
-// https://bitquill.atlassian.net/browse/AD-847
+// https://github.com/aws/amazon-documentdb-odbc-driver/issues/188
 BOOST_AUTO_TEST_CASE(TestConnectionTimeoutFail, *disabled()) {
   Prepare();
 
@@ -1190,7 +1190,7 @@ BOOST_AUTO_TEST_CASE(TestManyCursors) {
   }
 }
 
-// TODO: Memory leak, traced by https://bitquill.atlassian.net/browse/AD-813
+// TODO: Memory leak, traced by https://github.com/aws/amazon-documentdb-odbc-driver/issues/184
 BOOST_AUTO_TEST_CASE(TestManyCursors2, *disabled()) {
   connectToLocalServer("odbc-test");
 

@@ -559,7 +559,7 @@ void Configuration::ToJdbcOptionsMap(ArgumentMap& res) const {
   AddToMap(res, "refreshSchema", refreshSchema);
   AddToMap(res, "defaultFetchSize", defaultFetchSize);
   //TODO expose defaultAuthDB on the DSN config
-  //https://bitquill.atlassian.net/browse/AD-935
+  // https://github.com/aws/amazon-documentdb-odbc-driver/issues/176
   
 }
 
@@ -592,7 +592,7 @@ std::string Configuration::ToMongoDbConnectionString(
   mongoConnectionString << "@" << host;
   mongoConnectionString << ":" << port;
   //TODO expose defaultAuthDB on the DSN config
-  //https://bitquill.atlassian.net/browse/AD-935
+  // https://github.com/aws/amazon-documentdb-odbc-driver/issues/176
   mongoConnectionString << "/admin";
   mongoConnectionString << INIT_OPT << MONGO_URI_APPNAME << "="
                         << EncodeURIComponent(GetApplicationName());
@@ -619,10 +619,6 @@ std::string Configuration::ToMongoDbConnectionString(
     }
   }
   mongoConnectionString << options.str();
-
-  // tls configuration is handled using tls_options in connectionCPP
-  // TODO handle the other DSN configuration
-  // https://bitquill.atlassian.net/browse/AD-599
 
   return mongoConnectionString.str();
 }

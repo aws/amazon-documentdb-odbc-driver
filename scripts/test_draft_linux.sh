@@ -1,4 +1,4 @@
-# TODO: [AD-838](https://bitquill.atlassian.net/browse/AD-838)
+# TODO: [Automate setting up environment variables when building driver on Linux](https://github.com/aws/amazon-documentdb-odbc-driver/issues/173)
 # store current directory
 CURRENT_DIR=$(pwd)
 

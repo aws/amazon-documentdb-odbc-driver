@@ -509,7 +509,7 @@ ConversionResult::Type DocumentDbColumn::PutTime(
     } break;
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
-      // https://bitquill.atlassian.net/browse/AD-680
+      // https://github.com/aws/amazon-documentdb-odbc-driver/issues/178
       convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
     default:
@@ -544,7 +544,7 @@ ConversionResult::Type DocumentDbColumn::PutDate(
     } break;
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
-      // https://bitquill.atlassian.net/browse/AD-680
+      // https://github.com/aws/amazon-documentdb-odbc-driver/issues/178
       convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
     default:
@@ -576,7 +576,7 @@ ConversionResult::Type DocumentDbColumn::PutTimestamp(
     } break;
     case bsoncxx::type::k_utf8:
       // TODO: Determine if we could support reading data as string
-      // https://bitquill.atlassian.net/browse/AD-680
+      // https://github.com/aws/amazon-documentdb-odbc-driver/issues/178
       convRes = ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
       break;
     default:

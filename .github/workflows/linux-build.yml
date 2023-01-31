@@ -123,7 +123,7 @@ jobs:
         sudo make install
 
     # TODO enable clang-tidy-check
-    # https://bitquill.atlassian.net/browse/AD-726
+    # https://github.com/aws/amazon-documentdb-odbc-driver/issues/169
     
     # generate compile_commands.json file for clang-tidy-check, requires mongocxx and boost dependencies
     # - name: generate-compile-commands-file
@@ -276,7 +276,7 @@ jobs:
         sudo make install
 
     # TODO enable clang-tidy-check
-    # https://bitquill.atlassian.net/browse/AD-726
+    # https://github.com/aws/amazon-documentdb-odbc-driver/issues/169
     
     # generate compile_commands.json file for clang-tidy-check, requires mongocxx and boost dependencies
     # - name: generate-compile-commands-file
@@ -400,4 +400,4 @@ jobs:
 
 
 # TODO Linux build enhacements 
-#https://bitquill.atlassian.net/browse/AD-688
+# https://github.com/aws/amazon-documentdb-odbc-driver/issues/170
