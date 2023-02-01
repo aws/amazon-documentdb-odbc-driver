@@ -641,8 +641,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDataTypesAndColumnNames) {
   SQLExecDirect(stmt, req.data(), SQL_NTS);
 
   for (int i = 1; i <= numTests; i++) {
-    // TODO remove below if statement when bug from JDBC (AD-765) is fixed.
-    // https://bitquill.atlassian.net/browse/AD-766
+    // TODO remove below if statement when bug from JDBC is fixed.
+    // https://github.com/aws/amazon-documentdb-jdbc-driver/issues/498
+    // https://github.com/aws/amazon-documentdb-odbc-driver/issues/187
     // the fieldNull pair is the 13th pair
     if (i == 13)
       continue;
@@ -734,8 +735,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescConciseType) {
 
   callSQLColAttribute(stmt, req3, SQL_DESC_CONCISE_TYPE, SQL_VARBINARY);
 
-  // TODO re-enable this test when bug from JDBC (AD-765) is fixed.
-  // https://bitquill.atlassian.net/browse/AD-766
+  // TODO re-enable this test when bug from JDBC is fixed.
+  // https://github.com/aws/amazon-documentdb-jdbc-driver/issues/498
+  // https://github.com/aws/amazon-documentdb-odbc-driver/issues/187
   // const SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
   //
   // callSQLColAttribute(stmt, req3, SQL_DESC_CONCISE_TYPE, SQL_TYPE_NULL);
@@ -1068,8 +1070,9 @@ BOOST_AUTO_TEST_CASE(TestColAttributeDescType) {
 
   callSQLColAttribute(stmt, req3, SQL_DESC_TYPE, SQL_VARBINARY);
 
-  // TODO re-enable this test when bug from JDBC (AD-765) is fixed.
-  // https://bitquill.atlassian.net/browse/AD-766
+  // TODO re-enable this test when bug from JDBC is fixed.
+  // https://github.com/aws/amazon-documentdb-jdbc-driver/issues/498
+  // https://github.com/aws/amazon-documentdb-odbc-driver/issues/187
   // const SQLCHAR req4[] = "select fieldNull from meta_queries_test_001";
   //
   // callSQLColAttribute(stmt, req4, SQL_DESC_TYPE, SQL_TYPE_NULL);

@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeDefaultLoginTimeout) {
 // TODO investigate why the setConnectAttr are not being called before
 // establishing connection
 // enable test after fix
-// https://bitquill.atlassian.net/browse/AD-848
+// https://github.com/aws/amazon-documentdb-odbc-driver/issues/186
 #ifndef __APPLE__
 BOOST_AUTO_TEST_CASE(ConnectionAttributeLoginTimeout) {
   Prepare();

@@ -68,7 +68,7 @@ using documentdb::odbc::common::concurrent::CriticalSection;
   }
 
 // TODO replace and remove LOG_MSG
-// https://bitquill.atlassian.net/browse/AD-703
+// https://github.com/aws/amazon-documentdb-odbc-driver/issues/174
 // @Deprecated
 #define LOG_MSG(param) LOG_INFO_MSG(param)
 
@@ -184,7 +184,7 @@ class Logger {
   static std::shared_ptr< Logger > GetLoggerInstance() {
     // TODO add locks to prevent 2 or more instances being
     // created at once
-    // [AD-716](https://bitquill.atlassian.net/browse/AD-716)
+    // [Add locks on getLoggerInstance](https://github.com/aws/amazon-documentdb-odbc-driver/issues/175)
 
     if (!logger_)
       logger_ = std::shared_ptr< Logger >(new Logger());

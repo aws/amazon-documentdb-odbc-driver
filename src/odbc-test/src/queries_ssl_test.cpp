@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionSslReject) {
 }
 
 // TODO fix bug on logintimeoutsec on JDBC and ODBC
-// https://bitquill.atlassian.net/browse/AD-847
+// https://github.com/aws/amazon-documentdb-odbc-driver/issues/188
 BOOST_AUTO_TEST_CASE(TestLoginTimeout, *disabled()) {
   Prepare();
 

@@ -328,7 +328,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   LOG_DEBUG_MSG("SQLDriverConnect called");
 
   // TODO enable logging connection string
-  // https://bitquill.atlassian.net/browse/AD-702
+  // https://github.com/aws/amazon-documentdb-odbc-driver/issues/180
 
   // if (inConnectionString)
   //   LOG_INFO_MSG("Connection String: [" << inConnectionString << "]");

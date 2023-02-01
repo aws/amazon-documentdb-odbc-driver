@@ -31,7 +31,7 @@
 #include <vector>
 
 // Todo: Refactor boost::optional to std::optional after code base is migrated
-// to C++17 https://bitquill.atlassian.net/browse/AD-631
+// to C++17 https://github.com/aws/amazon-documentdb-odbc-driver/issues/179
 
 using namespace documentdb::odbc::common::concurrent;
 using namespace documentdb::odbc::jni::java;
@@ -1099,7 +1099,7 @@ JniErrorCode JniContext::DriverManagerGetConnection(
   }
 
   // TODO enable string logging and hide the user password.
-  // https://bitquill.atlassian.net/browse/AD-702
+  // https://github.com/aws/amazon-documentdb-odbc-driver/issues/180
   // LOG_INFO_MSG("Connection String: [" << connectionString << "]");
 
   jstring jConnectionString = env->NewStringUTF(connectionString);

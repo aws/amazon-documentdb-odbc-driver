@@ -71,7 +71,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     # TODO Reactivate cppcheck
-    # https://bitquill.atlassian.net/browse/AD-752
+    # https://github.com/aws/amazon-documentdb-odbc-driver/issues/171
     # - name: setup-cppcheck
     #   id: setup_cppcheck
     #   run: |
@@ -300,7 +300,7 @@ jobs:
         role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
         role-duration-seconds: 3600
     # TODO Reactivate cppcheck
-    # https://bitquill.atlassian.net/browse/AD-752
+    # https://github.com/aws/amazon-documentdb-odbc-driver/issues/171
     # - name: run-cppcheck
     #   id: setup_cppcheck
     #   run: |

@@ -59,8 +59,8 @@ else
 fi
 
 # [Re-]Install mongodb server
-# TODO [AD-833] make re-installing mongodb server optional
-# https://bitquill.atlassian.net/browse/AD-833
+# TODO: make re-installing mongodb server optional
+# https://github.com/aws/amazon-documentdb-odbc-driver/issues/172
 chmod +x $MAC_SCRIPT_DIR/reinstall_mongodb_mac.sh
 $MAC_SCRIPT_DIR/reinstall_mongodb_mac.sh
 

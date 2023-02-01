@@ -173,8 +173,8 @@ BOOST_AUTO_TEST_CASE(TestSQLSetStmtAttrRowArraySize) {
 
 #ifndef __APPLE__
 // only enable for Windows and Linux as it crashes on Mac
-// with iODBC, traced by AD-820
-// https://bitquill.atlassian.net/browse/AD-820
+// with iODBC, traced by [SPIKE] Two tests crashed on Mac with iODBC
+// https://github.com/aws/amazon-documentdb-odbc-driver/issues/183
 BOOST_AUTO_TEST_CASE(TestSQLDriverConnect) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
@@ -1146,7 +1146,7 @@ BOOST_AUTO_TEST_CASE(TestSQLSpecialColumns) {
   SQLCloseCursor(stmt);
 }
 
-// TODO: Memory leak, traced by https://bitquill.atlassian.net/browse/AD-813
+// TODO: Memory leak, traced by https://github.com/aws/amazon-documentdb-odbc-driver/issues/184
 BOOST_AUTO_TEST_CASE(TestFetchScrollLast, *disabled()) {
   CheckFetchScrollUnsupportedOrientation(SQL_FETCH_LAST);
 }
@@ -1161,8 +1161,8 @@ BOOST_AUTO_TEST_CASE(TestFetchScrollFirst, *disabled()) {
 
 #ifndef __APPLE__
 // only enable for Windows and Linux as it crashes on Mac
-// with iODBC, traced by AD-820
-// https://bitquill.atlassian.net/browse/AD-820
+// with iODBC, traced by [SPIKE] Two tests crashed on Mac with iODBC
+// https://github.com/aws/amazon-documentdb-odbc-driver/issues/183
 BOOST_AUTO_TEST_CASE(TestSQLError) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
@@ -1186,10 +1186,10 @@ BOOST_AUTO_TEST_CASE(TestSQLError) {
   std::vector< SQLWCHAR > actualMessage;
   actualMessage.insert(actualMessage.end(), &message[0],
                        &message[messageLen + 1]);
-  // variable actualMessage is to be used in AD-841
+  // variable actualMessage is to be used in https://github.com/aws/amazon-documentdb-odbc-driver/issues/185
 
   #if 0
-  // TODO: [AD-841](https://bitquill.atlassian.net/browse/AD-841)
+  // TODO: https://github.com/aws/amazon-documentdb-odbc-driver/issues/185
   // Check boundary condition with reduced buffer size.
   ret = SQLGetTypeInfo(stmt, SQL_INTERVAL_MONTH);
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
