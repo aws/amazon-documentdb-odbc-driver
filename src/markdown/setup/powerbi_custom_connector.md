@@ -39,9 +39,9 @@ Copy the `AmazonDocumentDBConnector.mez` file to the `<User>\Documents\Power BI 
 
 # Microsoft Power BI Gateway
 
-Important notes to make sure that the custom connector will work with Power BI Gatewy
-1. Make sure that the ODBC DSN be created in the ODBC data sources in System tab on the machine that Power BI Gateway is installed
-2. If you are using the internal SSH tunnel feature, the file `known_hosts` needs to be in a place where the Power BI Service account has access to it.
+Important notes to make sure that the custom connector will work with Power BI Gateway
+1. Make sure that the ODBC DSN is created in the ODBC data sources in the System tab on the machine that Power BI Gateway is installed.
+2. If you are using the internal SSH tunnel feature, the file `known_hosts` needs to be placed where the Power BI Service account can access it.
    ![known_hosts file permission](../images/known_hosts_file_permission.png)
 
-   Note this also applies to any file(s) that you might need to be able to establish a connection to your DocumentDB cluster, like if you need to use a pem certificate file to connect to your DocumentDB cluster
+   Note this also applies to any file(s) that you might need to be able to establish a connection to your DocumentDB cluster, like if you need to use a `pem` certificate file to connect to your DocumentDB cluster.
