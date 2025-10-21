@@ -30,6 +30,10 @@ env:
   ODBCINSTINI: "${{github.workspace}}/build/odbc/lib/documentdb-odbc-install.ini"
   ODBCINI: "${{github.workspace}}/odbc.ini"
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   build-mac-debug:
     runs-on: macos-11
