@@ -41,6 +41,10 @@ env:
   # Artifacts are created when pushing to develop branch on merge of pull requests.
   SHOULD_CREATE_ARTIFACTS: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop') || github.event.inputs.sign == true || github.event.inputs.sign == 'true' }}
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   trufflehog-git-secrets-scan:
     runs-on: ubuntu-latest
