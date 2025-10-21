@@ -29,6 +29,11 @@ env:
   DOC_DB_LOG_LEVEL: "debug"
   JAVA_HOME: "/usr/lib/jvm/java-17-amazon-corretto/"
 
+permissions:
+  contents: write
+  checks: write
+  pull-requests: write
+
 jobs:
   build-linux64:
     runs-on: ubuntu-20.04
