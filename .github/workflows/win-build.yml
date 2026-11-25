@@ -206,7 +206,7 @@ jobs:
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}} 
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: docdb-odbc-driver-win32-${{env.ODBC_DRIVER_VERSION}}
         path: |
@@ -220,7 +220,7 @@ jobs:
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: performance-win32-${{env.ODBC_DRIVER_VERSION}}
         path: build/odbc/bin/Release/performance.exe
@@ -253,7 +253,7 @@ jobs:
 
     - name: upload-test-file
       if: always() && (steps.runtests.outcome == 'failure')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: odbc-test-results-win32
         path: |
@@ -421,7 +421,7 @@ jobs:
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: docdb-odbc-driver-amd64-${{env.ODBC_DRIVER_VERSION}}
         path: |
@@ -435,7 +435,7 @@ jobs:
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: performance-amd64-${{env.ODBC_DRIVER_VERSION}}
         path: build/odbc/bin/Release/performance.exe
@@ -466,7 +466,7 @@ jobs:
 
     - name: upload-test-file
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: odbc-test-results-win64
         path: |
@@ -600,7 +600,7 @@ jobs:
 
     - name: upload-coverage
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: code-coverage
         path: coverage.cobertura.xml
@@ -615,7 +615,7 @@ jobs:
         ref: ''
 
     - name: Retrieve coverage
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v8
       with:
         name: code-coverage
 
@@ -698,7 +698,7 @@ jobs:
     
     - name: Upload Power BI Connector
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: AmazonDocumentDBConnector
         path: src/power-bi-connector/AmazonDocumentDBConnector.mez
