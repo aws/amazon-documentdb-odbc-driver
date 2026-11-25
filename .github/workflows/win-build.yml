@@ -176,6 +176,7 @@ jobs:
         Install-VcpkgPackages -Triplet x86-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+        VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}/.github/vcpkg-triplets
 
     - name: configure-and-build-driver
       run: |
@@ -391,6 +392,7 @@ jobs:
         Install-VcpkgPackages -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
+        VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}/.github/vcpkg-triplets
 
     - name: configure-and-build-driver
       run: |
@@ -573,6 +575,7 @@ jobs:
         Install-VcpkgPackages -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
+        VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}/.github/vcpkg-triplets
 
     - name: configure-and-build-driver
       run: |
