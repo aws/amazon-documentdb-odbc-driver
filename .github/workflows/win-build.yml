@@ -162,7 +162,7 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -o documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -OutFile documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
 
     - name: Install DocumentDB JDBC JAR
       run: |
@@ -378,7 +378,7 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -o documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -OutFile documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
     - name: Install DocumentDB JDBC JAR
       run: |
         mkdir -p ${{env.ODBC_BIN_PATH}}/libs
@@ -560,7 +560,7 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -o documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -OutFile documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
     - name: Install DocumentDB JDBC JAR
       run: |
         mkdir -p ${{env.ODBC_BIN_PATH}}/libs
