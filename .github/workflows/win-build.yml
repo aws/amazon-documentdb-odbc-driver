@@ -162,7 +162,7 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -o documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -OutFile documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
 
     - name: Install DocumentDB JDBC JAR
       run: |
@@ -176,6 +176,7 @@ jobs:
         Install-VcpkgPackages -Triplet x86-windows
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+        VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}/.github/vcpkg-triplets
 
     - name: configure-and-build-driver
       run: |
@@ -206,7 +207,7 @@ jobs:
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}} 
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: docdb-odbc-driver-win32-${{env.ODBC_DRIVER_VERSION}}
         path: |
@@ -220,7 +221,7 @@ jobs:
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: performance-win32-${{env.ODBC_DRIVER_VERSION}}
         path: build/odbc/bin/Release/performance.exe
@@ -253,7 +254,7 @@ jobs:
 
     - name: upload-test-file
       if: always() && (steps.runtests.outcome == 'failure')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: odbc-test-results-win32
         path: |
@@ -378,7 +379,7 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -o documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -OutFile documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
     - name: Install DocumentDB JDBC JAR
       run: |
         mkdir -p ${{env.ODBC_BIN_PATH}}/libs
@@ -391,6 +392,7 @@ jobs:
         Install-VcpkgPackages -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
+        VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}/.github/vcpkg-triplets
 
     - name: configure-and-build-driver
       run: |
@@ -421,7 +423,7 @@ jobs:
 
     - name: Upload ODBC driver build at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: docdb-odbc-driver-amd64-${{env.ODBC_DRIVER_VERSION}}
         path: |
@@ -435,7 +437,7 @@ jobs:
 
     - name: Upload performance test at push to develop
       if: ${{env.SHOULD_CREATE_ARTIFACTS == 'true'}}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: performance-amd64-${{env.ODBC_DRIVER_VERSION}}
         path: build/odbc/bin/Release/performance.exe
@@ -466,7 +468,7 @@ jobs:
 
     - name: upload-test-file
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: odbc-test-results-win64
         path: |
@@ -560,7 +562,7 @@ jobs:
       run: |
         mkdir -p cache/jar
         cd cache/jar
-        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -o documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
+        Invoke-WebRequest https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v${{env.JDBC_DRIVER_VERSION}}/documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar -OutFile documentdb-jdbc-${{env.JDBC_DRIVER_VERSION}}-all.jar
     - name: Install DocumentDB JDBC JAR
       run: |
         mkdir -p ${{env.ODBC_BIN_PATH}}/libs
@@ -573,6 +575,7 @@ jobs:
         Install-VcpkgPackages -Triplet x64-windows
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
+        VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}/.github/vcpkg-triplets
 
     - name: configure-and-build-driver
       run: |
@@ -600,7 +603,7 @@ jobs:
 
     - name: upload-coverage
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: code-coverage
         path: coverage.cobertura.xml
@@ -615,7 +618,7 @@ jobs:
         ref: ''
 
     - name: Retrieve coverage
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v8
       with:
         name: code-coverage
 
@@ -698,7 +701,7 @@ jobs:
     
     - name: Upload Power BI Connector
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: AmazonDocumentDBConnector
         path: src/power-bi-connector/AmazonDocumentDBConnector.mez

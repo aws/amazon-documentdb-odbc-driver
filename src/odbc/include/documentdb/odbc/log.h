@@ -18,6 +18,7 @@
 #ifndef _DOCUMENTDB_ODBC_LOG
 #define _DOCUMENTDB_ODBC_LOG
 
+#include <chrono>
 #include <fstream>
 #include <iomanip>
 #include <memory>

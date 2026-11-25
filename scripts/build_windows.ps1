@@ -29,7 +29,7 @@ if (-not (Test-Path -Path $JDBC_DRIVER_FULLPATH -PathType Leaf)) {
     $progresspreference = 'silentlyContinue'
     Invoke-WebRequest `
         https://github.com/aws/amazon-documentdb-jdbc-driver/releases/download/v$JDBC_DRIVER_VERSION/$JDBC_DRIVER_FILENAME `
-        -o $JDBC_DRIVER_FULLPATH
+        -OutFile $JDBC_DRIVER_FULLPATH
     $progressPreference = 'Continue'
     Write-Output "Download complete." 
 }
